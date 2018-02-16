@@ -3,13 +3,19 @@ from sqlite3 import Error
 
 # TODO: Use Views
 # TODO: raise custom exceptions instead of raise old
+# TODO: better solution for determine if db already exists
+
+DATABASE_PATH = "mirror_database.db"
 
 class CreateDatabase():
-    def __init__(self):
+    def __enter__(self):
         try:
-            self.__conn = sqlite3.connect(db_path)
+            self.__conn = sqlite3.connect(DATABASE_PATH)
         except Error as e:
             raise
+        return self
+    def __exit__(self,type,value,traceback):
+        self.__conn.close()    
         
     def create_database(self):
         sql_person = """CREATE TABLE IF NOT EXISTS persons(
@@ -37,18 +43,17 @@ class CreateDatabase():
                         CONSTRAINT fk_widgets FOREIGN KEY (widget) REFERENCES widgets(widget)
                             ON DELETE CASCADE
                     );"""
-
         try:
-            c = self.conn.cursor()
+            c = self.__conn.cursor()
             c.execute(sql_person)
             c.execute(sql_pictures_to_person)
             c.execute(sql_widgets)
             c.execute(sql_widget_to_person)
-            self.conn.commit()
+            self.__conn.commit()
         except Error as e:
-            self.conn.rollback()
-            print("error on create_database")
-            raise
+            self.__conn.rollback()
+            #print("error on create_database")
+            #raise
         
     def reset_database(self):
         pass    
