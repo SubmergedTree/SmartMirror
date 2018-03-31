@@ -5,6 +5,7 @@ import cv2
 
 #CAMERA_RESOLUTION = (480, 368)
 #TODO make attributes private
+#TODO close camera or use with
 class Camera():
     def __init__(self):
         self.camera = PiCamera()
