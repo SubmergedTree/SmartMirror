@@ -3,8 +3,12 @@ from time import sleep
 import math
 import threading
 import sys
-import user
-import converter
+#import user
+#import converter
+from user import User
+from user import UserDao
+from converter import GetUsersConverter
+
 
 #TODO: count connections and prevent by maxConnections new creation on sockets.
 # remove socket from list when connection is canceled from client. -> use map with key which contains uuid from client (client_info)
