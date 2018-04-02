@@ -180,8 +180,8 @@ class DatabaseAccess():
 ###              Tests              ###
 ####################################### 
 
-# with CreateDatabase() as cd:
-#     cd.reset_database()
+#with CreateDatabase() as cd:
+#    cd.reset_database()
 #     
 # def test_insert_get_picture():
 #     with DatabaseAccess() as da:

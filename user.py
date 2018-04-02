@@ -45,7 +45,7 @@ class UserDao():
         with DatabaseAccess() as da:
             user_tuple_list = da.get_users()
         for u in user_tuple_list:
-            user = User(u[0], u[1], u[2])
+            user = User(u[2], u[1], u[0])
             user_list.append(user)
         return user_list    
     

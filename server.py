@@ -53,10 +53,10 @@ class Server(threading.Thread):
          self.__connectionList.append(conn)
          
     class Connection(threading.Thread):
-        OK = "OK"
-        FAILURE = "FAILURE"
         def __init__(self, socket):
             threading.Thread.__init__(self)
+            self.__OK = "OK"
+            self.__FAILURE = "FAILURE"
             self.__socket = socket
             self.__socket.settimeout(50000)
             self.close_connection = False
@@ -74,6 +74,7 @@ class Server(threading.Thread):
             try:
                 while self.close_connection == False:
                     data = self.__socket.recv(1024)
+                    #print(data)
                     self.__decoded_data = data.decode('utf-8')
                     if self.__kind_of_request == "NONE":
                         self.__kind_of_request = self.__decoded_data
@@ -86,7 +87,10 @@ class Server(threading.Thread):
         def __getusers(self):
             dao = UserDao()
             converter = GetUsersConverter()
-            self.__socket.send(converter.get_json(dao.get_users()))
+            converted = converter.get_json(dao.get_users())
+            self.__send_header(converted)
+            print(converted)
+            self.__socket.send(converted)
             self.__reset_request()
         
         def __deleteuser(self):
@@ -102,21 +106,25 @@ class Server(threading.Thread):
             self.__reset_request()
         
         def __newuser(self):
-            if self.__kind_of_request == "NONE":
-                self.__socket.send(OK)
-                self.__kind_of_request = "SENDOK"
-            if self.__kind_of_request == "SENDOK":
+            if self.__specific_progress == "NONE":
+                self.__send_header_and_msg(self.__OK)
+                self.__specific_progress = "SENDOK"
+            elif self.__specific_progress == "SENDOK":
                 converter = GetUsersConverter()
                 user = converter.get_user(self.__decoded_data)  
                 dao = UserDao()
                 if dao.new_user(user) == True:
-                    self.__socket.send(OK)
+                    self.__send_header_and_msg(self.__OK)
                 else:        
-                    self.__socket.send(FAILURE)
+                    self.__send_header_and_msg(self.__FAILURE)
                 self.__reset_request()
                     
         def __cancelconnection(self):
             self.__reset_request()
+            
+        def __send_header_and_msg(self, toSend):
+            self.__send_header(toSend)
+            self.__socket.send(toSend)
         
         def __send_header(self, toSend):
             header = str(len(toSend)) + 'H'
