@@ -110,18 +110,18 @@ class DatabaseAccess():
             
     def delete_user(self, data):
         sql = '''DELETE FROM persons WHERE username = ?'''
-        self.__transact(sql, data, "delete_user")
+        return self.__transact(sql, data, "delete_user")
 
             
     def add_widget(self, data):
         sql = '''INSERT INTO widgets(widget)
                  VALUE(?)'''
-        self.__transact(sql, data, "add_widget")
+        return self.__transact(sql, data, "add_widget")
 
               
     def remove_widget(self, data):
         sql = '''DELETE FROM widgets WHERE widget = ?'''
-        self.__transact(sql, data, "remove_widget")
+        return self.__transact(sql, data, "remove_widget")
  
             
     def get_widgets(self):

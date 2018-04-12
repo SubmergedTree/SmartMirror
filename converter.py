@@ -17,6 +17,9 @@ class GetUsersConverter():
         user_dict = json.loads(json_str)
         user_res = user.User(user_dict["name"], user_dict["prename"], user_dict["username"])
         return user_res
+    
+    def get_delete_user(self, json_str):
+        delete_user_dict = json.loads(json_str)
         
 class GetWidgetsTO():
     def __init__(self):

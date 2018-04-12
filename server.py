@@ -3,11 +3,9 @@ from time import sleep
 import math
 import threading
 import sys
-#import user
-#import converter
 from user import User
 from user import UserDao
-from converter import GetUsersConverter
+from user import UserConverter
 
 
 #TODO: count connections and prevent by maxConnections new creation on sockets.
@@ -86,7 +84,7 @@ class Server(threading.Thread):
         
         def __getusers(self):
             dao = UserDao()
-            converter = GetUsersConverter()
+            converter = UserConverter()
             converted = converter.get_json(dao.get_users())
             self.__send_header(converted)
             print(converted)
@@ -94,7 +92,18 @@ class Server(threading.Thread):
             self.__reset_request()
         
         def __deleteuser(self):
-            self.__reset_request()
+            print(self.__decoded_data)
+            if self.__specific_progress == "NONE":
+                self.__send_header_and_msg(self.__OK)   
+                self.__specific_progress = "SENDOK"
+            elif self.__specific_progress == "SENDOK":
+                username = UserConverter().get_delete_user(self.__decoded_data)
+                print(username)
+                if UserDao().delete_user(username) == True:
+                    self.__send_header_and_msg(self.__OK)   
+                else:
+                    self.__send_header_and_msg(self.__FAILURE)                 
+                self.__reset_request()
         
         def __addpicture(self):
             self.__reset_request()
@@ -110,7 +119,7 @@ class Server(threading.Thread):
                 self.__send_header_and_msg(self.__OK)
                 self.__specific_progress = "SENDOK"
             elif self.__specific_progress == "SENDOK":
-                converter = GetUsersConverter()
+                converter = UserConverter()
                 user = converter.get_user(self.__decoded_data)  
                 dao = UserDao()
                 if dao.new_user(user) == True:
