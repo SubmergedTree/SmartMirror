@@ -106,7 +106,15 @@ class Server(threading.Thread):
                 self.__reset_request()
         
         def __addpicture(self):
-            self.__reset_request()
+            print(self.__decoded_data)
+            if self.__specific_progress == "NONE":
+                print("None")
+                self.__send_header_and_msg(self.__OK)
+             #   self.__specific_progress = "SENDOK"
+            elif self.__specific_progress == "SENDOK":
+                print("SENDOK")
+                self.__send_header_and_msg(self.__OK)
+                self.__reset_request()
         
         def __getwidgets(self):
             self.__reset_request()

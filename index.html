@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Smart Mirror</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+  
+<style>
+.classWithPad { margin:10px; padding:10px; }
+</style>
+   
+<body>
+	
+
+<h1>Smart Mirror</h1>
+
+<div class="row">
+    <div class="text-center col-md-6">
+        <div class="classWithPad" style="background-color:lavenderblush;">
+	        <div id="1">
+	        	Widget 1
+	        </div>
+        </div>
+    </div>
+    <div class="text-center col-md-6">
+        <div class="classWithPad" style="background-color:lavenderblush;">
+       		<div id="2">Widget 2</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="text-center col-md-6">
+        <div class="classWithPad" style="background-color:lavenderblush;">
+        	<div id="2">Widget 3</div>
+        </div>
+    </div>
+    <div class="text-center col-md-6">
+        <div class="classWithPad" style="background-color:lavenderblush;">
+        	<div id="2">Widget 3</div>  
+         </div>
+    </div>
+</div>
+
+<script language="javascript">
+var weatherTodayWidgetHTML = "Weather Today Widget"
+var quoteHTML = "Quote Widget"
+var jokeHTML = "Joke Widget"
+var nextFreeDayHTML = "Free Day Widget"
+var weatherNextWidgetHTML = "Weather Next Widget"
+
+function changeWidget(gridName, widgetName) {
+	var element = document.getElementById(gridName);
+	var newWidget = ''
+	switch(widgetName) { // use else if
+	    case 'quote':
+	    	newWidget = quoteHtml;
+	        break;
+	    case 'wheaterToday':
+	    	newWidget = weatherTodayWidgetHTML;
+	        break;
+	    case 'wheaterNext':
+	    	newWidget = weatherNextWidgetHTML;
+	        break;
+	    case 'nextFreeDay':
+	    	newWidget = nextFreeDayHTML;
+	        break;
+	    case 'joke':
+	    	newWidget = jokeHTML;
+	        break;
+	}
+   	element.innerHTML = newWidget;
+}  
+	
+var element = document.getElementById('1');
+
+element.innerHTML = "doo";
+
+changeWidget('2', "quote")
+
+</script>
+
+</body>
+</html>
