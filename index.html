@@ -7,80 +7,137 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   </head>
-  
+
 <style>
 .classWithPad { margin:10px; padding:10px; }
+.greenBackground {background-color: green;}
+.centerClock {
+   margin: auto;
+    width: 50%;
+    height: 50%;
+    font-size: 10em;
+}
 </style>
-   
+
 <body>
-	
 
-<h1>Smart Mirror</h1>
+<div id="hide">
+  <h1>Smart Mirror</h1>
 
-<div class="row">
-    <div class="text-center col-md-6">
-        <div class="classWithPad" style="background-color:lavenderblush;">
-	        <div id="1">
-	        	Widget 1
-	        </div>
-        </div>
-    </div>
-    <div class="text-center col-md-6">
-        <div class="classWithPad" style="background-color:lavenderblush;">
-       		<div id="2">Widget 2</div>
-        </div>
-    </div>
+  <div class="row">
+      <div class="text-center col-md-6">
+          <div class="classWithPad" style="background-color:lavenderblush;">
+            <div id="1"><span style="font-size: 5em;" class="glyphicon glyphicon-exclamation-sign"></span></div>
+          </div>
+      </div>
+      <div class="text-center col-md-6">
+          <div class="classWithPad" style="background-color:lavenderblush;">
+            <div id="2"><span style="font-size: 5em;" class="glyphicon glyphicon-exclamation-sign"></span></div>
+          </div>
+      </div>
+  </div>
+
+  <div class="row">
+      <div class="text-center col-md-6">
+          <div class="classWithPad" style="background-color:lavenderblush;">
+            <div id="3"><span style="font-size: 5em;" class="glyphicon glyphicon-exclamation-sign"></span></div>
+          </div>
+      </div>
+      <div class="text-center col-md-6">
+          <div class="classWithPad" style="background-color:lavenderblush;">
+            <div id="4"><span style="font-size: 5em;" class="glyphicon glyphicon-exclamation-sign"></span></div>
+           </div>
+      </div>
+  </div>
 </div>
 
-<div class="row">
-    <div class="text-center col-md-6">
-        <div class="classWithPad" style="background-color:lavenderblush;">
-        	<div id="2">Widget 3</div>
-        </div>
-    </div>
-    <div class="text-center col-md-6">
-        <div class="classWithPad" style="background-color:lavenderblush;">
-        	<div id="2">Widget 3</div>  
-         </div>
-    </div>
+<div id="idle">
+  <div id="idleClock" class="centerClock">
+  </div>
 </div>
 
-<script language="javascript">
-var weatherTodayWidgetHTML = "Weather Today Widget"
-var quoteHTML = "Quote Widget"
-var jokeHTML = "Joke Widget"
-var nextFreeDayHTML = "Free Day Widget"
-var weatherNextWidgetHTML = "Weather Next Widget"
 
-function changeWidget(gridName, widgetName) {
-	var element = document.getElementById(gridName);
-	var newWidget = ''
-	switch(widgetName) { // use else if
-	    case 'quote':
-	    	newWidget = quoteHtml;
-	        break;
-	    case 'wheaterToday':
-	    	newWidget = weatherTodayWidgetHTML;
-	        break;
-	    case 'wheaterNext':
-	    	newWidget = weatherNextWidgetHTML;
-	        break;
-	    case 'nextFreeDay':
-	    	newWidget = nextFreeDayHTML;
-	        break;
-	    case 'joke':
-	    	newWidget = jokeHTML;
-	        break;
-	}
-   	element.innerHTML = newWidget;
-}  
-	
-var element = document.getElementById('1');
+<script>
+var loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-size:50px\"></i></p>";
+var notSet = "<span style=\"font-size: 5em;\" class=\"glyphicon glyphicon-exclamation-sign\"></span>"
 
-element.innerHTML = "doo";
+changeModIdle()
 
-changeWidget('2', "quote")
+function changeWidget(id, html) { // call from python
+	var element = document.getElementById(id);
+  element.innerHTML = html;
+}
+
+function resetWidget() { // call from python
+  var element = document.getElementById('1');
+  element.innerHTML = notSet;
+  element = document.getElementById('2');
+  element.innerHTML = notSet;
+  element = document.getElementById('3');
+  element.innerHTML = notSet;
+  element = document.getElementById('4');
+  element.innerHTML = notSet;
+
+}
+
+function loadData(name, result) {
+  if (name === 'joke') {
+    document.getElementById('jokeText').innerHTML = result.value.joke;
+  }
+}
+
+function fillWithData(url, name) { // call from python
+  var xhr  = new XMLHttpRequest()
+  xhr.open('GET', url, true)
+  xhr.onload = function () {
+  	var result = JSON.parse(xhr.responseText);
+  	if (xhr.readyState == 4 && xhr.status == "200") {
+        console.log(result);
+        loadData(name, result);
+  	}
+  }
+  xhr.send(null);
+}
+
+function changeModWidgets() {
+  var divHide = document.getElementById("hide");
+  if (divHide.style.display === "none") {
+      divHide.style.display = "block";
+  } else {
+      divHide.style.display = "none";
+  }
+}
+
+function changeModIdle() {
+  var divHide = document.getElementById("idle");
+  if (divHide.style.display === "none") {
+      divHide.style.display = "block";
+  } else {
+      divHide.style.display = "none";
+  }
+}
+
+function changeMod() {// call from python
+  changeModWidgets()
+  changeModIdle()
+}
+
+function getTime() {
+  var time = new Date().toLocaleTimeString();
+  var element = document.getElementById("idleClock");
+  element.innerHTML = time;
+}
+setInterval(getTime, 1000);
+
+
+//simulate python calls
+changeWidget('2', "<b>Chuck Noris Jokes</b> <br> <br> <div id=\"jokeText\">" + loading + "</div>", 'joke');
+fillWithData("http://api.icndb.com/jokes/random", 'joke');
+changeMod()
+changeMod()
+
 
 </script>
 
