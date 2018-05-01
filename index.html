@@ -63,14 +63,14 @@
 var loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-size:50px\"></i></p>";
 var notSet = "<span style=\"font-size: 5em;\" class=\"glyphicon glyphicon-exclamation-sign\"></span>"
 
-changeModIdle()
+changeModeIdle()
 
 function changeWidget(id, html) { // call from python
 	var element = document.getElementById(id);
   element.innerHTML = html;
 }
 
-function resetWidget() { // call from python
+function resetWidgets() { // call from python
   var element = document.getElementById('1');
   element.innerHTML = notSet;
   element = document.getElementById('2');
@@ -82,26 +82,27 @@ function resetWidget() { // call from python
 
 }
 
-function loadData(name, result) {
-  if (name === 'joke') {
-    document.getElementById('jokeText').innerHTML = result.value.joke;
-  }
-}
+//function loadData(name, result) {
+//  if (name === 'joke') {
+//    document.getElementById('jokeText').innerHTML = result.value.joke;
+//  }
+//}
 
-function fillWithData(url, name) { // call from python
+function fillWithData(url, callback) { // call from python
   var xhr  = new XMLHttpRequest()
   xhr.open('GET', url, true)
   xhr.onload = function () {
   	var result = JSON.parse(xhr.responseText);
   	if (xhr.readyState == 4 && xhr.status == "200") {
         console.log(result);
-        loadData(name, result);
+        //loadData(name, result);
+        callback(result)
   	}
   }
   xhr.send(null);
 }
 
-function changeModWidgets() {
+function changeModeWidgets() {
   var divHide = document.getElementById("hide");
   if (divHide.style.display === "none") {
       divHide.style.display = "block";
@@ -110,7 +111,7 @@ function changeModWidgets() {
   }
 }
 
-function changeModIdle() {
+function changeModeIdle() {
   var divHide = document.getElementById("idle");
   if (divHide.style.display === "none") {
       divHide.style.display = "block";
@@ -119,9 +120,9 @@ function changeModIdle() {
   }
 }
 
-function changeMod() {// call from python
-  changeModWidgets()
-  changeModIdle()
+function changeMode() {// call from python
+  changeModeWidgets()
+  changeModeIdle()
 }
 
 function getTime() {
@@ -133,10 +134,10 @@ setInterval(getTime, 1000);
 
 
 //simulate python calls
-changeWidget('2', "<b>Chuck Noris Jokes</b> <br> <br> <div id=\"jokeText\">" + loading + "</div>", 'joke');
-fillWithData("http://api.icndb.com/jokes/random", 'joke');
-changeMod()
-changeMod()
+//changeWidget('2', "<b>Chuck Noris Jokes</b> <br> <br> <div id=\"jokeText\">" + loading + "</div>", 'joke');
+//fillWithData("http://api.icndb.com/jokes/random", 'joke');
+//changeMode()
+//changeMode()
 
 
 </script>
