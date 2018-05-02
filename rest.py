@@ -1,10 +1,14 @@
 from flask import Flask, jsonify, request
+from werkzeug import secure_filename
 from PyQt5.QtCore import QThread, QObject
-from database import UserDao, WidgetDao, PictureDao, WidgetUserDao, SafeSession
+from database import User, Widget, Picture, WidgetUser, SafeSession
 
 from logger import Logger
+from datetime import datetime
+
 
 # TODO: need to catch exception and return suitable status when errors occur.
+# e.g. server is knocked out by creating duplicated user (it restarts itself but client receives a 500)
 
 app = Flask(__name__)
 PORT = 5000
@@ -39,7 +43,7 @@ def get_users():
     Logger.info('request: getUsers.')
     user_list = []
     with SafeSession() as safe_session:  
-        for user in safe_session.get_session().query(UserDao):
+        for user in safe_session.get_session().query(User):
             user_dict = {}
             user_dict['username'] = user.username
             user_dict['prename'] = user.prename
@@ -55,7 +59,7 @@ def new_user():
     username = request.form['username']
     prename = request.form['prename']
     name = request.form['name']
-    user = UserDao(username=username, prename=prename, name=name)
+    user = User(username=username, prename=prename, name=name) #TODO: check if user already exists
     with SafeSession() as safe_session:
         safe_session.add(user)   
         safe_session.commit()  
@@ -67,18 +71,33 @@ def delete_user():
     Logger.info('request: deleteUser.')
     username = request.form['username']
     with SafeSession() as safe_session:
-        user_to_delete = safe_session.get_session().query(UserDao).filter_by(username=username).first() 
+        user_to_delete = safe_session.get_session().query(User).filter_by(username=username).first() 
+        if user_to_delete == None:
+            return jsonify('User: ' + username + ' does not exist'), HttpStatus.NOTFOUND
         safe_session.delete(user_to_delete)
         safe_session.commit()
-    return jsonify((username, email)), HttpStatus.SUCCESS
+    return jsonify('User: ' + username + ' deleted'), HttpStatus.SUCCESS
 
 
-@app.route("/addPictures", methods=["POST"])
+@app.route("/addPicture", methods=["POST"])
 def add_picture():
     Logger.info('request: addPictures.')
-    print(request.form['username'])
-    return jsonify(request.form)
-    
+    username = request.form['username']
+    Logger.info(username)
+    image = request.files['image']
+    Logger.info(image.filename)
+    image_name = username + str(datetime.now())
+    image = request.files['image']
+    image.save(secure_filename(image_name))
+    with SafeSession() as safe_session:
+        assigned_user = safe_session.get_session().query(User).filter_by(username=username).first() 
+        if assigned_user == None:
+            return jsonify('User: ' + username + ' does not exist'), HttpStatus.NOTFOUND
+        picture_to_store = Picture(username=assigned_user.username, image_path=image_name) # TODO: save in an openCV understandable manner.
+        safe_session.add(picture_to_store)
+        safe_session.commit()
+    return jsonify('Picture successfully added'), HttpStatus.CREATED 
+   
 
 @app.route("/getWidgets", methods=["GET"])
 def get_widgets():

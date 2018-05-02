@@ -1,0 +1,65 @@
+database.py - MainThread - setup_database - INFO - Database is ready.
+view.py - MainThread - __load_index_html - INFO - HTML Source: index.html
+rest.py - MainThread - __init__ - INFO - Rest API is ready.
+view.py - MainThread - __init__ - INFO - View is ready.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+database.py - MainThread - setup_database - INFO - Database is ready.
+view.py - MainThread - __load_index_html - INFO - HTML Source: index.html
+rest.py - MainThread - __init__ - INFO - Rest API is ready.
+view.py - MainThread - __init__ - INFO - View is ready.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+database.py - MainThread - setup_database - INFO - Database is ready.
+view.py - MainThread - __load_index_html - INFO - HTML Source: index.html
+rest.py - MainThread - __init__ - INFO - Rest API is ready.
+view.py - MainThread - __init__ - INFO - View is ready.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+database.py - MainThread - setup_database - INFO - Database is ready.
+view.py - MainThread - __load_index_html - INFO - HTML Source: index.html
+rest.py - MainThread - __init__ - INFO - Rest API is ready.
+view.py - MainThread - __init__ - INFO - View is ready.
+database.py - MainThread - setup_database - INFO - Database is ready.
+view.py - MainThread - __load_index_html - INFO - HTML Source: index.html
+rest.py - MainThread - __init__ - INFO - Rest API is ready.
+view.py - MainThread - __init__ - INFO - View is ready.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+database.py - MainThread - setup_database - INFO - Database is ready.
+view.py - MainThread - __load_index_html - INFO - HTML Source: index.html
+rest.py - MainThread - __init__ - INFO - Rest API is ready.
+view.py - MainThread - __init__ - INFO - View is ready.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+database.py - MainThread - setup_database - INFO - Database is ready.
+view.py - MainThread - __load_index_html - INFO - HTML Source: index.html
+rest.py - MainThread - __init__ - INFO - Rest API is ready.
+view.py - MainThread - __init__ - INFO - View is ready.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+database.py - MainThread - setup_database - INFO - Database is ready.
+view.py - MainThread - __load_index_html - INFO - HTML Source: index.html
+rest.py - MainThread - __init__ - INFO - Rest API is ready.
+view.py - MainThread - __init__ - INFO - View is ready.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+rest.py - Dummy-1 - new_user - INFO - request: newUser.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+rest.py - Dummy-1 - new_user - INFO - request: newUser.
+rest.py - Dummy-1 - new_user - INFO - request: newUser.
+rest.py - Dummy-1 - new_user - INFO - request: newUser.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+rest.py - Dummy-1 - delete_user - INFO - request: deleteUser.
+rest.py - Dummy-1 - delete_user - INFO - request: deleteUser.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+rest.py - Dummy-1 - new_user - INFO - request: newUser.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+rest.py - Dummy-1 - delete_user - INFO - request: deleteUser.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+database.py - MainThread - setup_database - INFO - Database is ready.
+view.py - MainThread - __load_index_html - INFO - HTML Source: index.html
+rest.py - MainThread - __init__ - INFO - Rest API is ready.
+view.py - MainThread - __init__ - INFO - View is ready.
+rest.py - Dummy-1 - new_user - INFO - request: newUser.
+rest.py - Dummy-1 - new_user - INFO - request: newUser.
+rest.py - Dummy-1 - delete_user - INFO - request: deleteUser.
+rest.py - Dummy-1 - get_users - INFO - request: getUsers.
+rest.py - Dummy-1 - new_user - INFO - request: newUser.
+rest.py - Dummy-1 - delete_user - INFO - request: deleteUser.

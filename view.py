@@ -33,6 +33,7 @@ class View():
         self.__load_index_html("index.html")
         self.__frame = self.__setup_web_view()
         self.__layout.addWidget(self.__web_view)
+        self.__win.showFullScreen()
         self.__win.show()
         self.__rest_server = RestApiThread()
         self.__setup_rest_server()

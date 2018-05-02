@@ -15,34 +15,33 @@ DB_FILENAME = 'database.db'
 db_engine = None
 Session = None
 
-# TODO: Remove DAO from Tablename
 
-class UserDao(Base):
-    __tablename__ = 'UserDao'
+class User(Base):
+    __tablename__ = 'User'
     username = Column(String(250), primary_key=True)
     prename = Column(String(250))
     name = Column(String(250))
-    pictures = relationship('PictureDao', cascade='all,delete', backref='UserDao')
-    widget_person = relationship('WidgetUserDao', cascade='all,delete', backref='UserDao')
+    pictures = relationship('Picture', cascade='all,delete', backref='User')
+    widget_person = relationship('WidgetUser', cascade='all,delete', backref='User')
 
 
-class PictureDao(Base):
-    __tablename__ = 'PictureDao'
-    username = Column(String(250), ForeignKey('UserDao.username'))
+class Picture(Base):
+    __tablename__ = 'Picture'
+    username = Column(String(250), ForeignKey('User.username'))
     image_path = Column(String(250), primary_key=True)
 
 
-class WidgetDao(Base):
-    __tablename__ = 'WidgetDao'
+class Widget(Base):
+    __tablename__ = 'Widget'
     widget = Column(String(250), primary_key=True)
-    widget_person = relationship('WidgetUserDao', cascade='all,delete', backref='WidgetDao')
+    widget_person = relationship('WidgetUser', cascade='all,delete', backref='Widget')
 
 
-class WidgetUserDao(Base):
-    __tablename__ = 'WidgetUserDao'
+class WidgetUser(Base):
+    __tablename__ = 'WidgetUser'
     mapping_id = Column(Integer, primary_key=True)
-    username = Column(String(250), ForeignKey('UserDao.username'))
-    widget = Column(String(250), ForeignKey('WidgetDao.widget'))
+    username = Column(String(250), ForeignKey('User.username'))
+    widget = Column(String(250), ForeignKey('Widget.widget'))
     position = Column(Integer)
     context = Column(String(250))
     
@@ -55,8 +54,8 @@ def setup_database():
         return to_test.is_file()
     
     def fill_widgets():
-        joke = WidgetDao(widget='Joke')
-        wheater_today = WidgetDao(widget='WheaterToday')
+        joke = Widget(widget='Joke')
+        wheater_today = Widget(widget='WheaterToday')
         with SafeSession as session:
             session.add(joke)
             session.flush()
