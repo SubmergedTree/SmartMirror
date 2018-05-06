@@ -6,6 +6,7 @@ import cv2
 #CAMERA_RESOLUTION = (480, 368)
 #TODO make attributes private
 #TODO close camera or use with
+
 class Camera():
     def __init__(self):
         self.camera = PiCamera()
@@ -37,8 +38,8 @@ class Camera():
                     return gray_image[y:y+w, x:x+h]
 
 # For testing
-#cam = Camera()
-#image = cam.capture_face()
+cam = Camera()
+image = cam.capture_face()
 
-#cv2.imshow("Image", image)
-#cv2.waitKey(0)
+cv2.imshow("Image", image)
+cv2.waitKey(0)

@@ -6,7 +6,6 @@ from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtNetwork import *
 import sys
 
-from rest import RestApiThread
 from logger import Logger
 
 # TODO:
@@ -27,21 +26,16 @@ fillWithData(http://api.icndb.com/jokes/random,loadData)
 '''    
 
 class View():
-    def __init__(self):
+    def __init__(self, fullscreen):
         self.__win, self.__layout = self.__setup_window()
         self.__web_view = QWebView()
         self.__load_index_html("index.html")
         self.__frame = self.__setup_web_view()
         self.__layout.addWidget(self.__web_view)
-        self.__win.showFullScreen()
+        if fullscreen:
+            self.__win.showFullScreen()
         self.__win.show()
-        self.__rest_server = RestApiThread()
-        self.__setup_rest_server()
         Logger.info('View is ready.')
-        
-    def __setup_rest_server(self):
-        # TODO: declare slots here
-        self.__rest_server.start()
         
     def __setup_window(self):
         window = QWidget()
@@ -87,8 +81,6 @@ app = QApplication([])
 main_view = View()
  
 sys.exit(app.exec_())
-main_view.change_widget(2)
-#main_view.fill_with_data()
 
 
         
