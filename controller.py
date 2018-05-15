@@ -5,13 +5,14 @@ import sys
 
 from view import View
 from rest import RestApi
-from face_recognizer import Learner, Recognizer
+from face_recognizer import FaceRecognizerScheduler
 
 
 class Signals(QObject):
     new_picture = pyqtSignal()
     finished_learning = pyqtSignal(list, object)
     recognized_user = pyqtSignal(str)
+
 
 signals = Signals()
    
@@ -22,10 +23,11 @@ class Controller():
         self.__view = view
         self.__api = api
         self.__threadpool = QThreadPool()
+        self.__face_recognizer_scheduler = FaceRecognizerScheduler(self.__threadpool, self.__is_currently_learning, finished_learning_signal, recognized_user_signal)
         
     def __setup_signals(self):
-        signals.new_picture.connect(new_picture)  
-        signals.recognized_user.connect(user_recognized) 
+        signals.new_picture.connect(self.new_picture)
+        signals.recognized_user.connect(self.user_recognized)
         
     @pyqtSlot()
     def new_picture(self):   
@@ -33,9 +35,10 @@ class Controller():
     
     @pyqtSlot()
     def user_recognized(self, username):
-        pass   
+        pass
+
+    def __is_currently_learning(self):
+        pass
 
     
-controller = Controller(View(), RestApi(signals.new_picture))   
-        
-        
+controller = Controller(View(), RestApi(signals.new_picture))
