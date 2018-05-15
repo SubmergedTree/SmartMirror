@@ -1,11 +1,10 @@
-from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import sys
 
 from view import View
-from rest import RestApi
-from face_recognizer import FaceRecognizerScheduler
+from api.rest import RestApi
+from recognition.face_recognizer import FaceRecognizerScheduler
 
 
 class Signals(QObject):

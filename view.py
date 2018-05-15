@@ -1,15 +1,15 @@
-import PyQt5
-from PyQt5.QtCore import QUrl 
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton 
-from PyQt5.QtWebKitWidgets import QWebView , QWebPage
-from PyQt5.QtWebKit import QWebSettings
-from PyQt5.QtNetwork import *
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
+
+try:
+    from PyQt5.QtWebKitWidgets import QWebView
+except:
+    from PyQt5.QtWebEngineWidgets import QWebEngineView as QWebView
 import sys
 
-from logger import Logger
+from util import Logger
 
-# TODO:
-# 
+class WebEngine: # TODO: build wrapper to ensure compatibility with QWebView and QWebEngineView
+    pass
 
 class HtmlFileLocation():
     INDEX = 'index.html' 
@@ -78,7 +78,7 @@ class View():
         
 app = QApplication([])
 
-main_view = View()
+main_view = View(False)
  
 sys.exit(app.exec_())
 

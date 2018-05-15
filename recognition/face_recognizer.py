@@ -1,11 +1,10 @@
-from PyQt5.QtCore import QRunnable, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QRunnable, QObject, pyqtSignal, pyqtSlot
 import cv2
 import os
 import numpy as np
 import queue
 
-from camera import Camera
-from database import User, Picture
+from database.database import SafeSession, User, Picture
 
 
 def detect_face_from_image(image):
@@ -57,37 +56,47 @@ class Learner(QRunnable):
 
 
 class Recognizer(QRunnable):
-    def __init__(self, users, face_recognizer, recognized_user_signal):
+    def __init__(self, camera, users, face_recognizer, recognized_user_signal):
+        self.__camera = camera
         self.__recognizable_users = users
         self.__face_recognizer = face_recognizer
         self.__recognized_user_signal = recognized_user_signal
         self.recognize = True
 
     def run(self):
-        camera = Camera()
         has_found = False
         while has_found is False and self.__recognize is True:
-            captured_image = camera.capture_face()   
+            captured_image = self.__camera.capture_face()
             has_found, found_user = self.__predict(captured_image, self.__recognizable_users)          
             if has_found:
                self.__recognized_user_signal(found_user)            
             
-    def __predict(self, img, user):
+    def __predict(self, captured_image, user):
         label = 0
         try:
             label, confidence = self.__face_recognizer.predict(captured_image)
         except:
             return False, ''    
-        return True, user[label]   
+        return True, user[label]
+
+
+class FaceRecognizerSignals(QObject):
+    finished_learning = pyqtSignal()
+    user_recognized = pyqtSignal(str)
+
 
 
 class FaceRecognizerScheduler: # TODO: keep signals internal in this module
-    def __init__(self, thread_pool, is_learning_callback , finished_learning_signal, recognized_user_signal):
-        self.__finished_learning_signal = finished_learning_signal
-        self.__finished_learning_signal.connect(self.finished_learning)
-        self.__recognized_user_signal = recognized_user_signal
+    def __init__(self, thread_pool, camera, is_learning_callback, finished_learning_callback, user_recognized_callback):
+        self.__camera = camera
+       #  self.__finished_learning_signal = finished_learning_signal
+       #  self.__finished_learning_signal.connect(self.finished_learning)
+       #  self.__recognized_user_signal = recognized_user_signal
+        self.__signals = FaceRecognizerSignals()
         
         self.__is_learning_callback = is_learning_callback
+        self.__finished_learning_callback = finished_learning_callback
+        self.__user_recognized_callback = user_recognized_callback
         
         self.__thread_pool = thread_pool 
         self.__learn_queue = queue.Queue() 
@@ -126,10 +135,13 @@ class FaceRecognizerScheduler: # TODO: keep signals internal in this module
         self.__is_learning = False
         while self.is_showing_widgets:
             pass
+        self.__finished_learning_callback()
         self.__user_list = user_list
         self.__face_recognizer_cv = face_recognizer
         self.schedule()                   
 
+    @pyqtSignal()
+    def user_recognized(self, username):
 
 
 # Possibilities

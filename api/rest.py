@@ -1,9 +1,8 @@
 from flask import Flask, jsonify, request
 from werkzeug import secure_filename
 from PyQt5.QtCore import QRunnable
-from database import User, Widget, Picture, WidgetUser, SafeSession
-
-from logger import Logger
+from database.database import User, SafeSession, Picture
+from util import Logger
 from datetime import datetime
 
 # TODO: need to catch exception and return suitable status when errors occur.
@@ -110,13 +109,13 @@ def add_picture():
 @app.route("/getWidgets", methods=["GET"])
 def get_widgets():
     Logger.info('request: getWidgets.')
-    return jsonify((username, email))
+    return jsonify(("username", "email"))
 
 
 @app.route("/updateWidgets", methods=["POST"])
 def update_widgets():
     Logger.info('request: updateWidgets.')
-    return jsonify((username, email))
+    return jsonify(("username", "email"))
 
 
 

@@ -63,3 +63,7 @@ rest.py - Dummy-1 - delete_user - INFO - request: deleteUser.
 rest.py - Dummy-1 - get_users - INFO - request: getUsers.
 rest.py - Dummy-1 - new_user - INFO - request: newUser.
 rest.py - Dummy-1 - delete_user - INFO - request: deleteUser.
+INFO - (filename)s - MainThread - setup_database - Database is ready.
+INFO - (filename)s - MainThread - setup_database - Database is ready.
+INFO - (filename)s - MainThread - setup_database - Database is ready.
+INFO - (filename)s - MainThread - __load_index_html - HTML Source: index.html
