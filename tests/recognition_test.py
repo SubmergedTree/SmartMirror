@@ -1,10 +1,12 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
-from recognition.face_recognizer import FaceRecognizerScheduler
+from recognition.face_recognizer import FaceRecognizerScheduler, detect_face_from_image
+from database.database import SafeSession, User, Picture
 from PyQt5.QtCore import QThreadPool
 
-cascade = ''
+
+cascade = '/Users/jannik/Desktop/Rasbpi/venv/lib/python3.6/site-packages/cv2/data/haarcascade_frontalface_alt.xml'
 camera_result_1 = ''
 
 class CameraMock:
@@ -18,20 +20,35 @@ class TestFaceRecognition(unittest.TestCase):
             return FaceRecognizerScheduler(QThreadPool(), camera,cascade, is_learning_callback, finished_learning_callback, user_recognized_callback)
 
     def test_initial_learn_and_recognize(self):
+        def fill_test_db():
+            user = User('Username', 'Prename', 'name')
+            user2 = User('Jmi', 'John', 'Smith')
 
-        def is_learning_c():
-            pass
+            picture1 = Picture()
+            picture2 = Picture()
 
-        def finished_learning_c():
-            pass
+            with SafeSession() as safe_session:
+                safe_session.add(user)
+                safe_session.add(user2)
+                safe_session.commit()
 
-        def user_recognized_c(username):
-            pass
+        fill_test_db()
+
+        should_recognize = 'Jmi'
+
+        is_learning_c = Mock()
+        finished_learning_c = Mock()
+        user_recognized_c = Mock()
 
         camera = CameraMock()
         camera.capture_face = MagicMock(return_value=camera_result_1)
 
-        f_r_c = self.set_up_face_recognizer(camera, is_learning_c, finished_learning_c(), user_recognized_c())
+        f_r_c = self.set_up_face_recognizer(camera, is_learning_c, finished_learning_c, user_recognized_c)
+
+        is_learning_c.assert_called_once()
+        finished_learning_c.assert_called_once()
+        user_recognized_c.assert_called_with(should_recognize)
+
 
     def test_initial_learn_and_recognize_with_user_without_pictures(self):
         pass
