@@ -172,3 +172,4 @@ venv.bak/
 
 # test data
 /test_data
+*.idea/
