@@ -172,4 +172,12 @@ venv.bak/
 
 # test data
 /test_data
+
+# other idea files
 *.idea/
+
+# logfile
+*.log
+
+# sqlite database
+*.db
