@@ -24,8 +24,8 @@ class TestFaceRecognition(unittest.TestCase):
             user = User('Username', 'Prename', 'name')
             user2 = User('Jmi', 'John', 'Smith')
 
-#            picture1 = Picture()
-#            picture2 = Picture()
+            picture1 = Picture()
+            picture2 = Picture()
 
             with SafeSession() as safe_session:
                 safe_session.add(user)
