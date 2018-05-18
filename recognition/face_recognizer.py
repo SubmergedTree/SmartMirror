@@ -20,8 +20,9 @@ def detect_face_from_image(image, cascade_classifier_path):
 
 
 class Learner(QRunnable):
-    def __init__(self, finished_learning_signal, cascade_classifier_path):
+    def __init__(self, finished_learning_signal, learning_error_signal,cascade_classifier_path):
         self.__finished_learning_signal = finished_learning_signal
+        self.__learning_error_signal = learning_error_signal
         self.__cascade_classifier_path = cascade_classifier_path
 
     def run(self):
@@ -59,20 +60,24 @@ class Learner(QRunnable):
 
 
 class Recognizer(QRunnable):
-    def __init__(self, camera, users, face_recognizer, recognized_user_signal):
+    def __init__(self, camera, users, face_recognizer, recognized_user_signal, recognizer_halt_signal):
         self.__camera = camera
         self.__recognizable_users = users
         self.__face_recognizer = face_recognizer
         self.__recognized_user_signal = recognized_user_signal
-        self.__recognize = True
+        self.__recognizer_halt_signal = recognizer_halt_signal
+        self.recognize = True
 
     def run(self):
         has_found = False
-        while has_found is False and self.__recognize is True:
+        while has_found is False and self.recognize is True:
             captured_image = self.__camera.capture_face()
             has_found, found_user = self.__predict(captured_image, self.__recognizable_users)          
             if has_found:
-                self.__recognized_user_signal(found_user)
+                self.__recognized_user_signal.emit(found_user)
+
+        if self.recognize is False:
+            self.__recognizer_halt_signal.emit()
             
     def __predict(self, captured_image, user):
         label = 0
@@ -86,6 +91,8 @@ class Recognizer(QRunnable):
 class FaceRecognizerSignals(QObject):
     finished_learning = pyqtSignal()
     user_recognized = pyqtSignal(str)
+    learning_error = pyqtSignal(Exception)
+    recognizer_halt = pyqtSignal()
 
 
 class FaceRecognizerScheduler:  # TODO: keep signals internal in this module
@@ -106,6 +113,8 @@ class FaceRecognizerScheduler:  # TODO: keep signals internal in this module
         self.__face_recognizer_cv = None
         self.__is_learning = True
         self.is_showing_widgets = False
+
+        self.__panic = False
         
         self.learn()
         self.schedule()
@@ -113,15 +122,16 @@ class FaceRecognizerScheduler:  # TODO: keep signals internal in this module
     def __setup_signals(self):
         self.__signals.finished_learning.connect(self.__finished_learning)
         self.__signals.user_recognized.connect(self.__user_recognized)
-        
-    def learn(self):  # We need a signal/slot to inform when recognizer is shut down -> in this slot set recognizer to None
-        self.__learn_queue.put(Learner(self.__signals.finished_learnings))
+        self.__signals.learning_error(self.__error_on_learning)
+        self.__signals.recognizer_halt(self.__recognizer_halt)
+
+    def learn(self):
+        self.__learn_queue.put(Learner(self.__signals.finished_learning, self.__signals.learning_error, self.__cascade_classifier_path))
         if self.__recognizer:
             self.__recognizer.recognize = False
-        self.schedule()
-     
+
     def schedule(self):
-        if self.__is_learning:
+        if self.__is_learning or self.__panic:
             return
         elif not self.__learn_queue.empty():  # TODO: wait until recognizer finished -> active waiting should do the job
             self.__recognizer = None
@@ -146,6 +156,14 @@ class FaceRecognizerScheduler:  # TODO: keep signals internal in this module
     def __user_recognized(self, username):
         self.__user_recognized_callback(username)
 
+    @pyqtSignal()
+    def __error_on_learning(self, e):
+        self.__panic = True
+        raise e
+
+    @pyqtSignal()
+    def __recognizer_halt(self):
+        self.schedule()
 
 
 # Possibilities

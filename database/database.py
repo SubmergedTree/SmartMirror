@@ -69,7 +69,7 @@ def setup_database():
     Logger.info('Database is ready.')
 
 
-class SafeSession():
+class SafeSession:
     def __enter__(self):
         self.__session = Session()
         return self
