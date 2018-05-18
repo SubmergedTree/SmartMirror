@@ -5,6 +5,7 @@ import numpy as np
 import queue
 
 from database.database import SafeSession, User, Picture
+from database.dao import UserDao, DBException
 
 # '/usr/local/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml'
 
@@ -20,10 +21,12 @@ def detect_face_from_image(image, cascade_classifier_path):
 
 
 class Learner(QRunnable):
-    def __init__(self, finished_learning_signal, learning_error_signal,cascade_classifier_path):
+    def __init__(self, finished_learning_signal, learning_error_signal,cascade_classifier_path, user_dao, picture_dao):
         self.__finished_learning_signal = finished_learning_signal
         self.__learning_error_signal = learning_error_signal
         self.__cascade_classifier_path = cascade_classifier_path
+        self.__user_dao = user_dao
+        self.__picture_dao = picture_dao
 
     def run(self):
         users = self.__get_users()
@@ -34,14 +37,22 @@ class Learner(QRunnable):
                
     def __get_users(self):
         users = []
-        with SafeSession() as safe_session:
-            users = safe_session.get_session().query(User)
+        #with SafeSession() as safe_session:
+        #    users = safe_session.get_session().query(User).all()
+        try:
+            users = self.__user_dao.get_all_user()
+        except DBException as e:
+            self.__learning_error_signal.emit(e)
         return users
     
     def __get_picture_paths_by_username(self, username):  # TODO
         picture_paths = []
-        with SafeSession() as safe_session:
-                assigned_user = safe_session.get_session().query(Picture).filter_by(username=username)
+        #with SafeSession() as safe_session:
+        #    assigned_user = safe_session.get_session().query(Picture).filter_by(username=username)
+        try:
+            picture_paths = self.__picture_dao.get_paths_by_username(username)
+        except DBException as e:
+            self.__learning_error_signal.emit(e)
         return picture_paths
     
     def __get_labels_faces(self, users):
@@ -95,8 +106,9 @@ class FaceRecognizerSignals(QObject):
     recognizer_halt = pyqtSignal()
 
 
-class FaceRecognizerScheduler:  # TODO: keep signals internal in this module
-    def __init__(self, thread_pool, camera, cascade_classifier_path,is_learning_callback, finished_learning_callback, user_recognized_callback):
+class FaceRecognizerScheduler:
+    def __init__(self, thread_pool, camera, cascade_classifier_path,is_learning_callback, finished_learning_callback,
+                 user_recognized_callback, user_dao, picture_dao):
         self.__camera = camera
         self.__cascade_classifier_path = cascade_classifier_path
 
@@ -114,6 +126,9 @@ class FaceRecognizerScheduler:  # TODO: keep signals internal in this module
         self.__is_learning = True
         self.is_showing_widgets = False
 
+        self.__user_dao = user_dao
+        self.__picture_dao = picture_dao
+
         self.__panic = False
         
         self.learn()
@@ -126,7 +141,8 @@ class FaceRecognizerScheduler:  # TODO: keep signals internal in this module
         self.__signals.recognizer_halt(self.__recognizer_halt)
 
     def learn(self):
-        self.__learn_queue.put(Learner(self.__signals.finished_learning, self.__signals.learning_error, self.__cascade_classifier_path))
+        self.__learn_queue.put(Learner(self.__signals.finished_learning, self.__signals.learning_error,
+                                       self.__cascade_classifier_path, self.__user_dao, self.__picture_dao))
         if self.__recognizer:
             self.__recognizer.recognize = False
 
