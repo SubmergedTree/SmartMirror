@@ -1,4 +1,4 @@
-from database import SafeSession, User, Widget, WidgetUser, Picture
+from database.database import SafeSession, User, Widget, WidgetUser, Picture
 from sqlalchemy.exc import SQLAlchemyError, DBAPIError, IntegrityError
 
 
