@@ -1,69 +1,277 @@
-import unittest
-from unittest.mock import MagicMock, Mock
+from recognition.recognition import Scheduler, detect_face_from_image
+from PyQt5.QtWidgets import *
+from database.database import *
+import sys
+import cv2
 
-from recognition.face_recognizer import FaceRecognizerScheduler, detect_face_from_image
-from database.database import SafeSession, User, Picture
-from PyQt5.QtCore import QThreadPool
+
+cascade = '/Users/jannik/PycharmProjects/SmartMirror/util/lbpcascade_frontalface.xml'
+camera_result_1_gray, camera_result_1_faces = detect_face_from_image(cv2.imread('test_data/faces/subject02.wink.pgm'), cascade)
+camera_result_2_gray, camera_result_2_faces = detect_face_from_image(cv2.imread('test_data/faces/subject03.sad.pgm'), cascade)
 
 
-cascade = '/Users/jannik/Desktop/Rasbpi/venv/lib/python3.6/site-packages/cv2/data/haarcascade_frontalface_alt.xml'
-camera_result_1 = ''
+user = User(username='Username', prename='Prename', name='name')
+user2 = User(username='Jmi', prename='John', name='Smith')
+
+picture1_user1 = Picture(username=user.username, image_path='test_data/faces/subject01.centerlight.pgm')
+picture2_user1 = Picture(username=user.username, image_path='test_data/faces/subject01.glasses.pgm')
+picture3_user1 = Picture(username=user.username, image_path='test_data/faces/subject01.happy.pgm')
+picture4_user1 = Picture(username=user.username, image_path='test_data/faces/subject01.leftlight.pgm')
+picture5_user1 = Picture(username=user.username, image_path='test_data/faces/subject01.noglasses.pgm')
+
+picture1_user2 = Picture(username=user2.username, image_path='test_data/faces/subject02.centerlight.pgm')
+picture2_user2 = Picture(username=user2.username, image_path='test_data/faces/subject02.glasses.pgm')
+picture3_user2 = Picture(username=user2.username, image_path='test_data/faces/subject02.happy.pgm')
+picture4_user2 = Picture(username=user2.username, image_path='test_data/faces/subject02.leftlight.pgm')
+picture5_user2 = Picture(username=user2.username, image_path='test_data/faces/subject02.noglasses.pgm')
+
+
+class UserDaoMock:
+    def get_all_user(self):
+        return [user, user2]
+
+
+class PictureDaoMock:
+    def get_paths_by_username(self, username):
+        if username == user.username:
+            return [picture1_user1, picture2_user1, picture3_user1, picture4_user1, picture5_user1]
+        elif username == user2.username:
+            return [picture1_user2, picture2_user2, picture3_user2, picture4_user2, picture5_user2]
+        return []
+
 
 class CameraMock:
     def __init__(self):
         pass
 
-
-class TestFaceRecognition(unittest.TestCase):
-
-    def set_up_face_recognizer(self, camera,is_learning_callback, finished_learning_callback, user_recognized_callback):
-            return FaceRecognizerScheduler(QThreadPool(), camera,cascade, is_learning_callback, finished_learning_callback, user_recognized_callback)
-
-    def test_initial_learn_and_recognize(self):
-        def fill_test_db():
-            user = User('Username', 'Prename', 'name')
-            user2 = User('Jmi', 'John', 'Smith')
-
-            picture1 = Picture()
-            picture2 = Picture()
-
-            with SafeSession() as safe_session:
-                safe_session.add(user)
-                safe_session.add(user2)
-                safe_session.commit()
-
-        fill_test_db()
-
-        should_recognize = 'Jmi'
-
-        is_learning_c = Mock()
-        finished_learning_c = Mock()
-        user_recognized_c = Mock()
-
-        camera = CameraMock()
-        camera.capture_face = MagicMock(return_value=camera_result_1)
-
-        f_r_c = self.set_up_face_recognizer(camera, is_learning_c, finished_learning_c, user_recognized_c)
-
-        is_learning_c.assert_called_once()
-        finished_learning_c.assert_called_once()
-        user_recognized_c.assert_called_with(should_recognize)
+    def capture_face(self):
+        return camera_result_1_gray
 
 
-    def test_initial_learn_and_recognize_with_user_without_pictures(self):
+class CameraMockUnknownFace:
+    def __init__(self):
         pass
 
-    def test_interrupt_recognition_with_learning(self):
+    def capture_face(self):
+        return camera_result_2_gray
+
+
+
+#### Test ####
+
+
+results = {'test_learn_recognize': 'failed',
+           'test_learn_recognize_learn_recognize': 'failed',
+           'test_learn_recognize_recognize': 'failed',
+           'test_learn_learn_recognize': 'failed'}
+
+s = None
+s2 = None
+s3 = None
+s4 = None
+s5 = None
+
+
+def test_learn_recognize():
+    global s
+    to_recognize = 'Jmi'
+
+    cb1 = False
+    cb2 = False
+
+    def is_learning_cb():
+        nonlocal cb1
+        cb1 = True
+
+    def finished_learning_cb():
+        nonlocal cb2
+        cb2 = True
+
+    def user_recognized_cb(username):
+        if username == to_recognize:
+            if cb1 and cb2:
+                results['test_learn_recognize'] = 'success'
+
+    s = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
+
+
+def test_learn_recognize_learn_recognize():
+    global s2
+    to_recognize = 'Jmi'
+
+    cb1_1 = False
+    cb2_1 = False
+
+    cb1_2 = False
+    cb2_2 = False
+
+    cb1_3 = False
+    cb2_3 = False
+
+    def is_learning_cb():
+        nonlocal cb1_1, cb2_1
+        #print("TEST2: IS LEARNING")
+        if not cb1_1:
+            cb1_1 = True
+        else:
+            cb2_1 = True
+
+    def finished_learning_cb():
+        nonlocal cb1_2, cb2_2
+        #print("TEST2: FINISHED LEARNING")
+        if not cb1_2:
+            cb1_2 = True
+        else:
+            cb2_2 = True
+
+    def user_recognized_cb(username):
+        nonlocal cb1_3, cb2_3
+        #print(username)
+        if username == to_recognize:
+            if not cb1_3:
+                cb1_3 = True
+                s2.learn()
+            else:
+                cb2_3 = True
+                if cb1_1 and cb1_2 and cb1_3 and cb2_1 and cb2_2 and cb2_3 and cb1_3 and cb2_3:
+                    results['test_learn_recognize_learn_recognize'] = 'success'
+
+    s2 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
+
+
+def test_learn_recognize_recognize():
+    global s3
+    to_recognize = 'Jmi'
+
+    cb1_1 = False
+    cb2_1 = False
+
+    cb1_2 = False
+    cb2_2 = False
+
+    cb1_3 = False
+    cb2_3 = False
+
+
+    def is_learning_cb():
+        nonlocal cb1_1, cb2_1
+        # print("TEST2: IS LEARNING")
+        if not cb1_1:
+            cb1_1 = True
+        else:
+            cb2_1 = True
+
+
+    def finished_learning_cb():
+        nonlocal cb1_2, cb2_2
+        # print("TEST2: FINISHED LEARNING")
+        if not cb1_2:
+            cb1_2 = True
+        else:
+            cb2_2 = True
+
+    def user_recognized_cb(username):
+        nonlocal cb1_3, cb2_3
+        if username == to_recognize:
+            if not cb1_3:
+                cb1_3 = True
+                s3.schedule()
+            else:
+                cb2_3 = True
+                if cb1_1 and cb1_2 and cb1_3 and not cb2_1 and not cb2_2 and cb2_3 and cb1_3 and cb2_3:
+                    results['test_learn_recognize_recognize'] = 'success'
+
+
+    s3 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
+
+
+def test_learn_learn_recognize():  # TODO
+    global s4
+    to_recognize = 'Jmi'
+
+    cb1_1 = False
+    cb2_1 = False
+
+    cb1_2 = False
+    cb2_2 = False
+
+    cb1_3 = False
+    cb2_3 = False
+
+
+    def is_learning_cb():
+        nonlocal cb1_1, cb2_1
+        # print("TEST2: IS LEARNING")
+        if not cb1_1:
+            cb1_1 = True
+        else:
+            cb2_1 = True
+
+
+    def finished_learning_cb():
+        nonlocal cb1_2, cb2_2
+        # print("TEST2: FINISHED LEARNING")
+        if not cb1_2:
+            cb1_2 = True
+        else:
+            cb2_2 = True
+
+    def user_recognized_cb(username):
+        nonlocal cb1_3, cb2_3
+        if username == to_recognize:
+            if not cb1_3:
+                cb1_3 = True
+                s3.schedule()
+            else:
+                cb2_3 = True
+                if cb1_1 and cb1_2 and cb1_3 and not cb2_1 and not cb2_2 and cb2_3 and cb1_3 and cb2_3:
+                    results['test_learn_recognize_recognize'] = 'success'
+
+
+    s4 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
+
+
+def test_try_to_recognize_unknown_face():  # TODO
+    global s5
+
+    def is_learning_cb():
         pass
 
-    def test_learn_triggered_during_show_widgets(self):
+    def finished_learning_cb():
         pass
 
-    def test_trigger_learning_during_learningn(self):
+    def user_recognized_cb(username):
         pass
 
-    def test_recognize_triggered_during_learning(self):
-        pass
+    s5 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMockUnknownFace(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
 
-    def test_recognize_triggered_during_learning(self):
-        pass
+
+
+#### End Tests ####
+
+
+class TestWindow(QMainWindow):
+    def __init__(self):
+        super(TestWindow, self).__init__()
+        layout = QVBoxLayout()
+        w = QWidget()
+        w.setLayout(layout)
+        self.setCentralWidget(w)
+        test_learn_recognize()
+        test_learn_recognize_learn_recognize()
+        test_learn_recognize_recognize()
+        test_try_to_recognize_unknown_face()
+        self.show()
+
+
+def on_quit():
+    for key, value in results.items():
+        print(key + ": " + value)
+    print("quit")
+
+app = QApplication([])
+t = TestWindow()
+print("INSTRUCTION: Close the Test-Window after few minutes.")
+#test1() # works
+app.aboutToQuit.connect(on_quit)
+sys.exit(app.exec_())
