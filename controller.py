@@ -4,7 +4,7 @@ import sys
 
 from view import View
 from api.rest import RestApi
-from recognition.face_recognizer import FaceRecognizerScheduler
+from recognition.TO_REMOVE_face_recognizer import FaceRecognizerScheduler
 
 
 class Signals(QObject):
