@@ -1,7 +1,23 @@
-from picamera.array import PiRGBArray
-from picamera import PiCamera
+try:
+    from picamera.array import PiRGBArray
+    from picamera import PiCamera
+    found_picamera_module = True
+except:
+    found_picamera_module = False
 import time
 import cv2
+
+
+class CameraPi:
+    pass
+
+
+class CameraCV:
+    pass
+
+
+class Camera:
+    pass
 
 #CAMERA_RESOLUTION = (480, 368)
 #TODO make attributes private
