@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from werkzeug import secure_filename
 from PyQt5.QtCore import QRunnable
 from database.database import User, SafeSession, Picture
-from util import Logger
+from util.logger import Logger
 from datetime import datetime
 
 # TODO: need to catch exception and return suitable status when errors occur.
@@ -21,8 +21,10 @@ class HttpStatus():
     CONFLICT = 409
     INTERNALSERVERERROR = 500
 
+
 new_picture_signal = None
-    
+
+
 class RestApi(QRunnable): 
     def __init__(self, signal):
         global comon_signal
@@ -116,7 +118,3 @@ def get_widgets():
 def update_widgets():
     Logger.info('request: updateWidgets.')
     return jsonify(("username", "email"))
-
-
-
-    

@@ -6,7 +6,7 @@ except:
     from PyQt5.QtWebEngineWidgets import QWebEngineView as QWebView
 import sys
 
-from util import Logger
+from util.logger import Logger
 
 class WebEngine: # TODO: build wrapper to ensure compatibility with QWebView and QWebEngineView
     pass
