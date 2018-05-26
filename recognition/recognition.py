@@ -91,14 +91,11 @@ class Recognizer(QRunnable):
         self.recognize = True
 
     def __predict(self, captured_image, user):
-        label = 0
         try:
             label, confidence = self.face_recognizer.predict(captured_image)
-            print(label)
-            print(confidence)
         except:
             return False, ''
-        return True, user[label]
+        return (True, user[label]) if confidence <= 50 else (False, '')
 
     def run(self):
         has_found = False
@@ -107,9 +104,8 @@ class Recognizer(QRunnable):
             has_found, found_user = self.__predict(captured_image, self.users)
             if has_found:
                 self.signals.user_recognized.emit(found_user.username)
-
-        #self.signals.user_recognized.emit('username recognized')
-        # self.signals.recognizer_halt.emit()
+        if not self.recognize:
+            self.signals.recognizer_halt.emit()
 
 
 class Scheduler(QObject):

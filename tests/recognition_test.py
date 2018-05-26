@@ -1,5 +1,6 @@
 from recognition.recognition import Scheduler, detect_face_from_image
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import QTimer
 from database.database import *
 import sys
 import cv2
@@ -56,9 +57,7 @@ class CameraMockUnknownFace:
         return camera_result_2_gray
 
 
-
 #### Test ####
-
 
 results = {'test_learn_recognize': 'failed',
            'test_learn_recognize_learn_recognize': 'failed',
@@ -70,6 +69,13 @@ s2 = None
 s3 = None
 s4 = None
 s5 = None
+
+test_try_to_recognize_unknown_face_user_recognized = None
+
+
+def eval_test_try_to_recognize_unknown_face():
+    if test_try_to_recognize_unknown_face_user_recognized == False:
+        results['test_learn_learn_recognize'] = 'success'
 
 
 def test_learn_recognize():
@@ -225,23 +231,26 @@ def test_learn_learn_recognize():  # TODO
             else:
                 cb2_3 = True
                 if cb1_1 and cb1_2 and cb1_3 and not cb2_1 and not cb2_2 and cb2_3 and cb1_3 and cb2_3:
-                    results['test_learn_recognize_recognize'] = 'success'
+                    pass
+                    #results['test_learn_recognize_recognize'] = 'success'
 
 
     s4 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
 
 
-def test_try_to_recognize_unknown_face():  # TODO
+def test_try_to_recognize_unknown_face():
     global s5
 
     def is_learning_cb():
         pass
 
     def finished_learning_cb():
-        pass
+        global test_try_to_recognize_unknown_face_user_recognized
+        test_try_to_recognize_unknown_face_user_recognized = False
 
     def user_recognized_cb(username):
-        pass
+        global test_try_to_recognize_unknown_face_user_recognized
+        test_try_to_recognize_unknown_face_user_recognized = True
 
     s5 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMockUnknownFace(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
 
@@ -265,13 +274,18 @@ class TestWindow(QMainWindow):
 
 
 def on_quit():
+    eval_test_try_to_recognize_unknown_face()
     for key, value in results.items():
         print(key + ": " + value)
     print("quit")
 
 app = QApplication([])
 t = TestWindow()
-print("INSTRUCTION: Close the Test-Window after few minutes.")
-#test1() # works
+print("INSTRUCTION: Wait until test finished.")
+timer = QTimer()
+timer.timeout.connect(lambda: t.close())
+timer.setSingleShot(True)
+timer.start(900)
+
 app.aboutToQuit.connect(on_quit)
 sys.exit(app.exec_())
