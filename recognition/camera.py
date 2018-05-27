@@ -12,6 +12,10 @@ SCALE_FACTOR = 1.2
 MIN_NEIGHBORS = 5
 
 
+class PiCameraNotSupportedException(Exception):
+    pass
+
+
 class WhichCamera:
     PI = 0
     CV = 1
@@ -79,10 +83,13 @@ class CameraCV(BaseCamera):
 class Camera:
     def __init__(self, cascade, which_camera):
         global found_picamera_module
-        if found_picamera_module:
-            self.__camera = CameraPi(cascade, PiCamera())
-        else:
+        if which_camera == WhichCamera.CV:
             self.__camera = CameraCV(cascade, cv2.VideoCapture(0))
+        elif which_camera == WhichCamera.PI:
+            if found_picamera_module:
+                self.__camera = CameraPi(cascade, PiCamera())
+            else:
+                raise PiCameraNotSupportedException()
 
     def capture_face(self):
         return self.__camera.capture_face()

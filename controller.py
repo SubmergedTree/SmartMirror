@@ -5,7 +5,7 @@ from recognition.recognition import Scheduler
 from view import View
 from root_dir import ROOT_DIR
 
-
+# TODO must run in an seperate non main thread to avoid being blocked by View. View MUST run in main thread.
 class Controller:
     def __init__(self, View, RestServer, RecognizerScheduler, Camera, UserDao, PictureDao, WidgetDao, WidgetUserDao):
         cascade = ROOT_DIR + "/util/lbpcascade_frontalface.xml"
