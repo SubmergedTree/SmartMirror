@@ -26,6 +26,7 @@ class BaseCamera:
         self.__cascade = cascade
         self._faces = []
         self._gray_image = None
+        self.stop = False
 
     def _get_nearest_face(self):
         nearest = self._faces[0]
@@ -60,6 +61,8 @@ class CameraPi(BaseCamera):
             self.__raw_capture.truncate(0)
             if len(self._faces) == 0:
                 continue
+            elif self.stop:
+                return None
             else:
                 return self._get_nearest_face()
 
@@ -70,7 +73,7 @@ class CameraCV(BaseCamera):
         self.__capture_device = capture_device
 
     def capture_face(self):
-        while True:
+        while not self.stop:
             ret, frame = self.__capture_device.read()
             self._detect_faces(frame)
             if len(self._faces) == 0:
@@ -78,7 +81,7 @@ class CameraCV(BaseCamera):
             else:
                 self.__capture_device.release()
                 return self._get_nearest_face()
-
+        return None
 
 class Camera:
     def __init__(self, cascade, which_camera):
@@ -93,6 +96,10 @@ class Camera:
 
     def capture_face(self):
         return self.__camera.capture_face()
+
+    def stop(self):
+        self.__camera.stop = True
+
 
 #CAMERA_RESOLUTION = (480, 368)
 #TODO make attributes private

@@ -107,6 +107,10 @@ class Recognizer(QRunnable):
         if not self.recognize:
             self.signals.recognizer_halt.emit()
 
+    def stop_recognizer(self):
+        self.camera.stop()
+        self.recognize = False
+
 
 class Scheduler(QObject):
     def __init__(self, user_dao, picture_dao, camera, cascade,
@@ -167,7 +171,7 @@ class Scheduler(QObject):
     def learn(self):
         self.queue.put(Learner(self.cascade, LearnerSignals(), self.user_dao, self.picture_dao))
         if self.recognizer:
-            self.recognizer.recognize = False
+            self.recognizer.stop_recognizer()
         self.schedule()
 
     def schedule(self):
@@ -192,6 +196,7 @@ class Scheduler(QObject):
 
 def is_learning_cb():
     print("starting learning")
+
 
 def finished_learning_cb():
     print("finished learning")
