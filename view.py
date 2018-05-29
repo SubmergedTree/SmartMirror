@@ -68,7 +68,6 @@ class View:
         self.__index_html_path = index_html_path
         self.__win, self.__layout = self.__setup_window()
         self.__web_engine = WebEngineFacade(which_web_engine, self.__layout)
-        self.__win.show()
 
     def __setup_window(self):
         window = QWidget()
@@ -77,11 +76,13 @@ class View:
         window.setLayout(layout)
         return window, layout
 
-    def __load_index_html(self):
+    def load_index_html(self):
         with open(self.__index_html_path) as fh:
             html = fh.read()
         self.__web_engine.engine.load_html(html)
 
+    def show_window(self):
+        self.__win.show()
 
 
 # class HtmlFileLocation():
