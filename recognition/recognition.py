@@ -99,7 +99,7 @@ class Recognizer(QRunnable):
 
     def run(self):
         has_found = False
-        while has_found is False and self.recognize is True:
+        while has_found is False and self.recognize is True: # TODO:should we check captured_image if it is none ?
             captured_image = self.camera.capture_face()
             has_found, found_user = self.__predict(captured_image, self.users)
             if has_found:

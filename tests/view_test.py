@@ -4,18 +4,23 @@ from PyQt5.QtCore import *
 from view import View, WebEngineFacade
 import sys
 from root_dir import ROOT_DIR
+import time
 
-index_html_path = ROOT_DIR + 'index.html'
+index_html_path = ROOT_DIR + '/html/index.html'
 index_html_test_path = ROOT_DIR + '/tests/test_data/test.html'
 
 view = None
 
+
 class ControllerMock(QRunnable):
-    def __int__(self):
-        pass
+    def __init__(self, view):
+        super(ControllerMock, self).__init__()
+        self.__view = view
 
     def run(self):
-        view.load_index_html()  # need signal slot
+        time.sleep(3)
+        self.__view.change_ui_mode()
+        #view.load_index_html()  # need signal slot
         while True:
             pass
 
@@ -23,9 +28,9 @@ class ControllerMock(QRunnable):
 
 app = QApplication(sys.argv)
 
-c_mock = ControllerMock()
 pool = QThreadPool()
-view = View(False, WebEngineFacade.Standard, index_html_test_path)
+view = View(False, WebEngineFacade.Standard, index_html_path)
+c_mock = ControllerMock(view)
 pool.start(c_mock)
 view.show_window()
 

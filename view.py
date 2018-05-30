@@ -63,6 +63,9 @@ class WebEngineFacade:
         return self.__engine
 
 
+#class ViewSignals:
+#    pass
+
 class View:
     def __init__(self, fullscreen, which_web_engine, index_html_path):
         self.__index_html_path = index_html_path
@@ -76,13 +79,18 @@ class View:
         window.setLayout(layout)
         return window, layout
 
-    def load_index_html(self):
+    def __load_index_html(self):
         with open(self.__index_html_path) as fh:
             html = fh.read()
         self.__web_engine.engine.load_html(html)
 
     def show_window(self):
         self.__win.show()
+        self.__load_index_html()
+
+    def change_ui_mode(self):
+        self.__web_engine.engine.eval_js('changeMode();')
+
 
 
 # class HtmlFileLocation():

@@ -65,25 +65,25 @@ body {
 
 
 <script>
-var loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-size:50px\"></i></p>";
-var notSet = "<span style=\"font-size: 5em;\" class=\"glyphicon glyphicon-exclamation-sign\"></span>"
+const loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-size:50px\"></i></p>";
+const notSet = "<span style=\"font-size: 5em;\" class=\"glyphicon glyphicon-exclamation-sign\"></span>"
 
-changeModeIdle()
+changeModeIdle();
 
 function changeWidget(id, html) { // call from python
-	var element = document.getElementById(id);
-  element.innerHTML = html;
+    let element = document.getElementById(id);
+    element.innerHTML = html;
 }
 
 function resetWidgets() { // call from python
-  var element = document.getElementById('1');
-  element.innerHTML = notSet;
-  element = document.getElementById('2');
-  element.innerHTML = notSet;
-  element = document.getElementById('3');
-  element.innerHTML = notSet;
-  element = document.getElementById('4');
-  element.innerHTML = notSet;
+    let element = document.getElementById('1');
+    element.innerHTML = notSet;
+    element = document.getElementById('2');
+    element.innerHTML = notSet;
+    element = document.getElementById('3');
+    element.innerHTML = notSet;
+    element = document.getElementById('4');
+    element.innerHTML = notSet;
 
 }
 
@@ -126,8 +126,8 @@ function changeModeIdle() {
 }
 
 function changeMode() {// call from python
-  changeModeWidgets()
-  changeModeIdle()
+  changeModeWidgets();
+  changeModeIdle();
 }
 
 function getTime() {
@@ -136,6 +136,11 @@ function getTime() {
   element.innerHTML = time;
 }
 setInterval(getTime, 1000);
+
+
+// AJAX
+function loadWidget(path) {
+}
 
 
 //simulate python calls
