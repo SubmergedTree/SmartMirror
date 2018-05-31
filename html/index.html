@@ -63,6 +63,7 @@ body {
   </div>
 </div>
 
+<div id="ajax_test">std</div>
 
 <script>
 const loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-size:50px\"></i></p>";
@@ -84,7 +85,6 @@ function resetWidgets() { // call from python
     element.innerHTML = notSet;
     element = document.getElementById('4');
     element.innerHTML = notSet;
-
 }
 
 //function loadData(name, result) {
@@ -94,21 +94,21 @@ function resetWidgets() { // call from python
 //}
 
 function fillWithData(url, callback) { // call from python
-  var xhr  = new XMLHttpRequest()
+  const xhr  = new XMLHttpRequest()
   xhr.open('GET', url, true)
   xhr.onload = function () {
-  	var result = JSON.parse(xhr.responseText);
+  	const result = JSON.parse(xhr.responseText);
   	if (xhr.readyState === 4 && xhr.status === "200") {
         console.log(result);
         //loadData(name, result);
         callback(result)
   	}
-  }
+  };
   xhr.send(null);
 }
 
 function changeModeWidgets() {
-  var divHide = document.getElementById("hide");
+  const divHide = document.getElementById("hide");
   if (divHide.style.display === "none") {
       divHide.style.display = "block";
   } else {
@@ -117,7 +117,7 @@ function changeModeWidgets() {
 }
 
 function changeModeIdle() {
-  var divHide = document.getElementById("idle");
+  const divHide = document.getElementById("idle");
   if (divHide.style.display === "none") {
       divHide.style.display = "block";
   } else {
@@ -131,17 +131,27 @@ function changeMode() {// call from python
 }
 
 function getTime() {
-  var time = new Date().toLocaleTimeString();
-  var element = document.getElementById("idleClock");
+  const time = new Date().toLocaleTimeString();
+  const element = document.getElementById("idleClock");
   element.innerHTML = time;
 }
 setInterval(getTime, 1000);
 
 
-// AJAX
+// AJAX ; Ajax forbids to read files from FS
 function loadWidget(path) {
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            document.getElementById("ajax_test").innerHTML = this.responseText;
+
+        }
+    };
+    xhttp.open("GET", path, true);
+    xhttp.send();
 }
 
+loadWidget("/html/ChuckNorisJokes.wdgt");
 
 //simulate python calls
 //changeWidget('2', "<b>Chuck Noris Jokes</b> <br> <br> <div id=\"jokeText\">" + loading + "</div>", 'joke');
