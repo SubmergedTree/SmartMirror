@@ -63,18 +63,20 @@ body {
   </div>
 </div>
 
-<div id="ajax_test">std</div>
-
 <script>
 const loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-size:50px\"></i></p>";
-const notSet = "<span style=\"font-size: 5em;\" class=\"glyphicon glyphicon-exclamation-sign\"></span>"
+const notSet = "<span style=\"font-size: 5em;\" class=\"glyphicon glyphicon-exclamation-sign\"></span>";
 
 changeModeIdle();
+
+//////////////////////////////////////////////////////// Widget REST client
+
 
 function changeWidget(id, html) { // call from python
     let element = document.getElementById(id);
     element.innerHTML = html;
 }
+
 
 function resetWidgets() { // call from python
     let element = document.getElementById('1');
@@ -87,26 +89,78 @@ function resetWidgets() { // call from python
     element.innerHTML = notSet;
 }
 
-//function loadData(name, result) {
-//  if (name === 'joke') {
-//    document.getElementById('jokeText').innerHTML = result.value.joke;
-//  }
-//}
+// Weather Buffer
+let weatherNowInterval = setInterval(weatherNowIntervalCallback, 1500000);
+let weatherNowJson  = "";
 
-function fillWithData(url, callback) { // call from python
-  const xhr  = new XMLHttpRequest()
-  xhr.open('GET', url, true)
+function weatherNowIntervalCallback() {
+    weatherNowJson = "";
+}
+
+function loadWidget(url, position, widgetType, params) { // call from python
+    const element = document.getElementById(position);
+    element.innerHTML = loading;
+    switch (widgetType) {
+        case "ChuckNorisJokes":
+            restCall(url, chuckNorisEval, position, params);
+            break;
+        case "WeatherNow":
+            if (weatherNowJson === "" ) {
+                restCall(url, weatherNowEval, position, params);
+                weatherNowInterval = setInterval(weatherNowIntervalCallback, 1500000);
+            } else {
+                weatherNowEval(weatherNowJson, position);
+            }
+            break;
+    }
+}
+
+function restCall(url, evalFunction, position, params) {
+  const xhr  = new XMLHttpRequest();
+  if (params.localeCompare("")) {
+      url = url + "?" + params;
+  }
+  xhr.open('GET', url, true);
   xhr.onload = function () {
-  	const result = JSON.parse(xhr.responseText);
-  	if (xhr.readyState === 4 && xhr.status === "200") {
-        console.log(result);
-        //loadData(name, result);
-        callback(result)
-  	}
+  	if (xhr.readyState === 4 && xhr.status === 200) {
+  	    evalFunction(JSON.parse(xhr.responseText), position);
+  	} else {
+  	    // show error
+    }
   };
   xhr.send(null);
 }
 
+
+function chuckNorisEval(result, position) {
+    const html = "<b>Chuck Noris Jokes</b> <br> <br> <div id=\"text\">" + result.value.joke + "</div>";
+    changeWidget(position, html);
+}
+
+
+function weatherNowEval(result, position) {
+    const html = "<b> Weather in "+ result.name +"</b> <br> <br> " +
+        "<div id=\"text\">Cloudiness: " + result.clouds.all + "%</div>" +
+        "<div id=\"text\">Humidity: " + result.main.humidity + "%</div>" +
+        "<div id=\"text\">Temperature: " + result.main.temp + "</div>";
+    changeWidget(position, html);
+}
+
+/*
+Ideas for Widgets:
+weather now
+weather forecast
+yomama jokes
+chuck noris jokes
+next public holiday day
+cat facts
+dog images
+ */
+
+//////////////////////////////////////////////////////// Idle / Widget view changer
+
+
+//////////////////////////////////////////////////////// Idle / Widget view changer
 function changeModeWidgets() {
   const divHide = document.getElementById("hide");
   if (divHide.style.display === "none") {
@@ -130,28 +184,36 @@ function changeMode() {// call from python
   changeModeIdle();
 }
 
+////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////// Clock
 function getTime() {
   const time = new Date().toLocaleTimeString();
   const element = document.getElementById("idleClock");
   element.innerHTML = time;
 }
 setInterval(getTime, 1000);
+////////////////////////////////////////////////////////
 
 
-// AJAX ; Ajax forbids to read files from FS
-function loadWidget(path) {
-    const xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            document.getElementById("ajax_test").innerHTML = this.responseText;
-
+// from: https://stackoverflow.com/questions/2090551/parse-query-string-in-javascript (slightly modernized)
+function getQueryVariable(variable) {
+    const query = window.location.search.substring(1);
+    const vars = query.split('&');
+    for (let i = 0; i < vars.length; i++) {
+        const pair = vars[i].split('=');
+        if (decodeURIComponent(pair[0]) === variable) {
+            return decodeURIComponent(pair[1]);
         }
-    };
-    xhttp.open("GET", path, true);
-    xhttp.send();
+    }
+    console.log('Query variable %s not found', variable);
 }
 
-loadWidget("/html/ChuckNorisJokes.wdgt");
+
+const weatherParam = "q=Karlsruhe&APPID=528e2f5512c2e05e6f00eac20a9c0cb5&units=metric";
+//loadWidget("http://api.icndb.com/jokes/random", 1, "ChuckNorisJokes", "");
+loadWidget("http://api.openweathermap.org/data/2.5/weather", 2, "WeatherNow", weatherParam);
+loadWidget("http://api.openweathermap.org/data/2.5/weather", 3, "WeatherNow", weatherParam);
 
 //simulate python calls
 //changeWidget('2', "<b>Chuck Noris Jokes</b> <br> <br> <div id=\"jokeText\">" + loading + "</div>", 'joke');
