@@ -112,6 +112,13 @@ function loadWidget(url, position, widgetType, params) { // call from python
                 weatherNowEval(weatherNowJson, position);
             }
             break;
+        case "WeatherForecast":
+            restCall(url, weatherForecastEval, position, params); // TODO: same mechanism like in weatherNow
+            break;
+        case "CatFacts":
+            break;
+        case "DogImages":
+            break;
     }
 }
 
@@ -144,6 +151,40 @@ function weatherNowEval(result, position) {
         "<div id=\"text\">Humidity: " + result.main.humidity + "%</div>" +
         "<div id=\"text\">Temperature: " + result.main.temp + "</div>";
     changeWidget(position, html);
+}
+
+function weatherForecastEval(result, position) {
+    let itCounter = 0;
+    let html = "<b> Weather Forecast in "+ result.city.name +"</b> <br> <br> ";
+    result.list.some(forecast => { // doesn't work because there are forecasts for different hours on the same day. -> Filter dates manually
+        itCounter++;
+        const date = new Date(forecast.dt * 1000);
+        const prettyDate = date.getDate() + " " + date.getMonth() + " " + date.getFullYear();
+        html += "<div id=\"text\">Forecast for: : " + prettyDate + "%</div>" +
+            "<div id=\"text\">Cloudiness: " + forecast.clouds.all + "%</div>" +
+            "<div id=\"text\">Humidity: " + forecast.main.humidity + "%</div>" +
+            "<div id=\"text\">Temperature: " + forecast.main.temp + "</div>";
+        return itCounter === 3;
+     });
+    changeWidget(position, html);
+}
+
+function yomammaEval(result, position) {
+    const html = "<b>Yo Mamma Jokes</b> <br> <br> <div id=\"text\">" + result.joke + "</div>";
+    changeWidget(position, html);
+}
+
+function nextPublicHoildayDayEval(result, position) {
+
+}
+
+function catFactsEval(result, position) {
+    const html = "<b>Cat Facts</b> <br> <br> <div id=\"text\">" + result.fact + "</div>";
+    changeWidget(position,html)
+}
+
+function dogImagesEval(result, position) {
+
 }
 
 /*
@@ -212,8 +253,8 @@ function getQueryVariable(variable) {
 
 const weatherParam = "q=Karlsruhe&APPID=528e2f5512c2e05e6f00eac20a9c0cb5&units=metric";
 //loadWidget("http://api.icndb.com/jokes/random", 1, "ChuckNorisJokes", "");
-loadWidget("http://api.openweathermap.org/data/2.5/weather", 2, "WeatherNow", weatherParam);
-loadWidget("http://api.openweathermap.org/data/2.5/weather", 3, "WeatherNow", weatherParam);
+//loadWidget("http://api.openweathermap.org/data/2.5/weather", 2, "WeatherNow", weatherParam);
+loadWidget("http://api.openweathermap.org/data/2.5/forecast", 3, "WeatherForecast", weatherParam);
 //changeMode()
 
 
