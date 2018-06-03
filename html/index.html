@@ -72,7 +72,7 @@ changeModeIdle();
 //////////////////////////////////////////////////////// Widget REST client
 
 
-function changeWidget(id, html) { // call from python
+function changeWidget(id, html) {
     let element = document.getElementById(id);
     element.innerHTML = html;
 }
@@ -100,12 +100,12 @@ function weatherNowIntervalCallback() {
 function loadWidget(url, position, widgetType, params) { // call from python
     const element = document.getElementById(position);
     element.innerHTML = loading;
-    switch (widgetType) {
+    switch (widgetType) { // TODO: registering instead of switch case
         case "ChuckNorisJokes":
             restCall(url, chuckNorisEval, position, params);
             break;
         case "WeatherNow":
-            if (weatherNowJson === "" ) {
+            if (weatherNowJson === "" ) { // TODO: better buffering: not only last call
                 restCall(url, weatherNowEval, position, params);
                 weatherNowInterval = setInterval(weatherNowIntervalCallback, 1500000);
             } else {
@@ -148,10 +148,10 @@ function weatherNowEval(result, position) {
 
 /*
 Ideas for Widgets:
-weather now
+weather now  x
 weather forecast
 yomama jokes
-chuck noris jokes
+chuck noris jokes  x
 next public holiday day
 cat facts
 dog images
@@ -214,11 +214,6 @@ const weatherParam = "q=Karlsruhe&APPID=528e2f5512c2e05e6f00eac20a9c0cb5&units=m
 //loadWidget("http://api.icndb.com/jokes/random", 1, "ChuckNorisJokes", "");
 loadWidget("http://api.openweathermap.org/data/2.5/weather", 2, "WeatherNow", weatherParam);
 loadWidget("http://api.openweathermap.org/data/2.5/weather", 3, "WeatherNow", weatherParam);
-
-//simulate python calls
-//changeWidget('2', "<b>Chuck Noris Jokes</b> <br> <br> <div id=\"jokeText\">" + loading + "</div>", 'joke');
-//fillWithData("http://api.icndb.com/jokes/random", 'joke');
-//changeMode()
 //changeMode()
 
 
