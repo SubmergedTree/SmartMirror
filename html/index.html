@@ -89,13 +89,47 @@ function resetWidgets() { // call from python
     element.innerHTML = notSet;
 }
 
-// Weather Buffer
-let weatherNowInterval = setInterval(weatherNowIntervalCallback, 1500000);
-let weatherNowJson  = "";
+class Buffer{
+    constructor(ttlInMillisecods) {
+        this.ttl = ttlInMillisecods;
+        this.container = []
+    }
 
-function weatherNowIntervalCallback() {
-    weatherNowJson = "";
+    get(key) {
+        const timeNow = new Date();
+        let foundEntry = null;
+        this.container.forEach((entry, index, object) => {
+            if (entry.ttl < new Date().getTime()) {
+                object.splice(index, 1);
+            }
+            if(entry.key === key) {
+                foundEntry = entry
+            }
+        });
+        return foundEntry.value;
+    }
+
+    set(key, value) {
+        for (entry in this.container) {
+            if (entry.key === key) {
+                return;
+            }
+        }
+        class NewEntry{
+            constructor(key, value, ttl) {
+                this.key = key;
+                this.value = value;
+                this.ttl = ttl;
+            }
+        }
+        this.container.push(new NewEntry(key, value, new Date().getTime() + ttl));
+    }
 }
+
+const XV_MinInMilliseconds = 900000;
+
+const buffer = new Buffer(XV_MinInMilliseconds);
+
 
 function loadWidget(url, position, widgetType, params) { // call from python
     const element = document.getElementById(position);
@@ -105,12 +139,12 @@ function loadWidget(url, position, widgetType, params) { // call from python
             restCall(url, chuckNorisEval, position, params);
             break;
         case "WeatherNow":
-            if (weatherNowJson === "" ) { // TODO: better buffering: not only last call
+          //  if (weatherNowJson === "" ) { // TODO: better buffering: not only last call
                 restCall(url, weatherNowEval, position, params);
-                weatherNowInterval = setInterval(weatherNowIntervalCallback, 1500000);
-            } else {
-                weatherNowEval(weatherNowJson, position);
-            }
+        //        weatherNowInterval = setInterval(weatherNowIntervalCallback, 1500000);
+        //    } else {
+        //        weatherNowEval(weatherNowJson, position);
+        //    }
             break;
         case "WeatherForecast":
             restCall(url, weatherForecastEval, position, params); // TODO: same mechanism like in weatherNow
@@ -154,18 +188,21 @@ function weatherNowEval(result, position) {
 }
 
 function weatherForecastEval(result, position) {
-    let itCounter = 0;
-    let html = "<b> Weather Forecast in "+ result.city.name +"</b> <br> <br> ";
-    result.list.some(forecast => { // doesn't work because there are forecasts for different hours on the same day. -> Filter dates manually
-        itCounter++;
-        const date = new Date(forecast.dt * 1000);
-        const prettyDate = date.getDate() + " " + date.getMonth() + " " + date.getFullYear();
-        html += "<div id=\"text\">Forecast for: : " + prettyDate + "%</div>" +
-            "<div id=\"text\">Cloudiness: " + forecast.clouds.all + "%</div>" +
-            "<div id=\"text\">Humidity: " + forecast.main.humidity + "%</div>" +
-            "<div id=\"text\">Temperature: " + forecast.main.temp + "</div>";
-        return itCounter === 3;
-     });
+    alert(result.list[0].dt_txt);
+        alert(result.list[0].clouds.all);
+        alert(result.list[0].main.humidity);
+        alert(result.list[0].main.temp);
+
+   // let itCounter = 0;
+   // let html = "<b> Weather Forecast in "+ result.city.name +"</b> <br> <br> ";
+   // result.list.some(forecast => {
+   //     itCounter++;
+        let html = "<div id=\"text\">Forecast for: " + result.list[0].dt_txt + "</div>" +
+            "<div id=\"text\">Cloudiness: " + result.list[0].clouds.all + "%</div>" +
+            "<div id=\"text\">Humidity: " + result.list[0].main.humidity + "%</div>" +
+            "<div id=\"text\">Temperature: " + result.list[0].main.temp + " °C</div>";
+   //     return itCounter === 3;
+   //  });
     changeWidget(position, html);
 }
 
@@ -184,6 +221,7 @@ function catFactsEval(result, position) {
 }
 
 function dogImagesEval(result, position) {
+        const html = "<b>Cat Facts</b> <br> <br> <div id=\"text\">" + result.fact + "</div>";
 
 }
 
