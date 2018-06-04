@@ -181,3 +181,5 @@ venv.bak/
 
 # sqlite database
 *.db
+
+config.json
