@@ -96,7 +96,6 @@ class Buffer{
     }
 
     get(key) {
-        const timeNow = new Date();
         let foundEntry = null;
         this.container.forEach((entry, index, object) => {
             if (entry.ttl < new Date().getTime()) {
