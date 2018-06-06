@@ -130,7 +130,7 @@ const XV_MinInMilliseconds = 900000;
 const buffer = new Buffer(XV_MinInMilliseconds);
 
 
-function loadWidget(url, position, widgetType, params) { // call from python
+function loadWidget(url, position, widgetType, params) { // call from python TODO: temporary
     const element = document.getElementById(position);
     element.innerHTML = loading;
     switch (widgetType) { // TODO: registering instead of switch case
@@ -296,6 +296,6 @@ loadWidget("http://api.openweathermap.org/data/2.5/forecast", 3, "WeatherForecas
 
 
 </script>
-
 </body>
+
 </html>

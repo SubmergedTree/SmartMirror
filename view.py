@@ -91,6 +91,12 @@ class View:
     def change_ui_mode(self):
         self.__web_engine.engine.eval_js('changeMode();')
 
+    def reset_widgets(self):
+        self.__web_engine.engine.eval_js('resetWidgets();')
+
+    def load_widget(self, position, widgetType, context):
+        exec_string = 'loadWidget({}, {}, {});'.format(position, widgetType, context)
+        self.__web_engine.engine.eval_js(exec_string)
 
 
 # class HtmlFileLocation():
@@ -98,7 +104,7 @@ class View:
 #     JOKE = 'joke.html'
 #
 #     #we need html path, js path, widget name
-#     # rest url is hardcoded in index.html
+#     # rest url is hardcoded in index.html        self.__web_engine.engine.eval_js('changeMode();')
 #
 # html = '''<b>Chuck Noris Jokes</b> <br> <br> <div id=\"jokeText\">'''
 # js = '''function loadData(result) {
