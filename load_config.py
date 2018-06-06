@@ -15,7 +15,7 @@ class Config:
         self.server_port = server_port
 
 
-class LoadConfig:
+class ConfigLoader:
     def __init__(self, default_web_engine, default_camera, default_server_port, mapping):
         self.__default_web_engine = default_web_engine
         self.__default_camera = default_camera
@@ -41,15 +41,20 @@ class LoadConfig:
         full_path = ROOT_DIR + relative_path
         try:
             fh = open(full_path, "r")
-            raw = fh.read()
-            config_dict = json.load(raw)
+            config_dict = json.load(fh)
             web_engine_str = config_dict["webEngine"]
             camera_str = config_dict["camera"]
-            port_str = config_dict["serverPort"]
+            port = config_dict["serverPort"]
             api_keys_list = config_dict["apiKeys"]
             web_engine, camera = self.__evaluate_simple(web_engine_str=web_engine_str, camera_str=camera_str)
             api_key_dict = self.__api_keys_list_to_dict(api_keys_list)
-            return api_key_dict, web_engine, camera
-        except (IOError, KeyError) as e:
+            return api_key_dict, Config(web_engine, camera, port)
+        except (IOError, KeyError, ValueError) as e:
             return {}, self.__get_default_config()
+        # TODO: log error
+        finally:
+            try:
+                fh.close()
+            except Exception as e:
+                pass
             # TODO: log error

@@ -1,0 +1,17 @@
+{
+  "webEngine": "legacy",
+  "FOO": "pi",
+  "serverPort": 5000,
+  "apiKeys": [
+    {
+      "widget": "WeatherNow",
+      "name": "APPID",
+      "key": "*****"
+    },
+    {
+      "widget": "WeatherForecast",
+      "name": "APPID",
+      "key": "*****"
+    }
+  ]
+}
