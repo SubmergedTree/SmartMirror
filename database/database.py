@@ -44,7 +44,7 @@ class WidgetUser(Base):
     context = Column(String(250))
     
     
-def setup_database():
+def setup_database(optional_file_path=DB_FILENAME):
     global Session, db_engine
     
     def is_db_already_created():
@@ -60,7 +60,7 @@ def setup_database():
             session.add(wheater_today)
             session.commit()
 
-    db_engine = create_engine('sqlite:///' + DB_FILENAME) 
+    db_engine = create_engine('sqlite:///' + optional_file_path)
     Base.metadata.create_all(db_engine)
     Session = sessionmaker(bind=db_engine) 
     if not is_db_already_created():
