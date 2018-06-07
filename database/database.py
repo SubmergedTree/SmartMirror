@@ -32,6 +32,7 @@ class Picture(Base):
 class Widget(Base):
     __tablename__ = 'Widget'
     widget = Column(String(250), primary_key=True)
+    base_url = Column(String(250))
     widget_person = relationship('WidgetUser', cascade='all,delete', backref='Widget')
 
 

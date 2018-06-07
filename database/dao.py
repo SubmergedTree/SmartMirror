@@ -47,8 +47,24 @@ class PictureDao:
 
 
 class WidgetDao:
-    pass
+
+    def get_base_url(self, widget):
+        pass
+
+    def get_widgets(self):
+        pass
+
+    def add_widget(self):
+        pass
 
 
 class WidgetUserDao:
-    pass
+
+    def get_mapping(self, username):
+        pass
+
+    def update(self, username, position, context):
+        pass
+
+    def delete(self, username, position):
+        pass
