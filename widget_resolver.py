@@ -1,18 +1,19 @@
+from widget import Widget
 
 
-# TODO When loading widgets (do rest call) in python evaluate usage of an async waterfall like structure
-class WidgetController:
-
+class WidgetResolver:
     def __init__(self, api_keys, widget_user_dao, widget_dao):
         self.__api_keys = api_keys
         self.__widget_user_dao = widget_user_dao
         self.__widget_dao = widget_dao
 
     def process_widgets(self, username):
-        pass
-
-    def __get_widget_user_mapping(self, username):
-        mapping = self.__widget_user_dao.get_widget_position_context(username)
+        widgets = []
+        mapping_table = self.__widget_user_dao.get_widget_position_context(username)
+        for mapping in mapping_table:
+            widgets.append(Widget(mapping.widget, self.__build_url(mapping.widget),
+                                  mapping.position, mapping.context))
+        return widgets
 
     def __build_url(self, widget):
         url = self.__widget_dao.get_base_url(widget)
