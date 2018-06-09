@@ -192,19 +192,3 @@ class Scheduler(QObject):
 
     def shut_down(self):
         self.threadpool.waitForDone()
-
-
-def is_learning_cb():
-    print("starting learning")
-
-
-def finished_learning_cb():
-    print("finished learning")
-
-
-def user_recognized_cb(username):
-    print("user recognized: " + username)
-
-#app = QApplication([])
-#s = Scheduler(UserDao(), PictureDao(), is_learning_cb, finished_learning_cb, user_recognized_cb)
-#sys.exit(app.exec_())
