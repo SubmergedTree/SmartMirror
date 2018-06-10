@@ -1,10 +1,12 @@
 import os
+from util.path import compare_filenames_in_path, string_after_last_slash
 
 JS_FILENAME_END = 'Eval.js'
 HTML_FILENAME_END = 'Widget.html'
 JS_FILENAME_END_CHAR_COUNT = len(JS_FILENAME_END)
 HTML_FILENAME_END_CHAR_COUNT = len(HTML_FILENAME_END)
-JS_INJECT_TEMPLATE = 'const {} = {}'
+JS_INJECT_TEMPLATE = 'const {} = \"{}\";'
+BEGIN_SCRIPT_TAG = '<script>'
 END_SCRIPT_TAG = '</script>'
 
 
@@ -32,7 +34,7 @@ class HtmlBuilder:
                 js_files.append(os.path.join(self.__js_dir, file))
         for file in os.listdir(self.__html_dir):
             if file.endswith(HTML_FILENAME_END):
-                print(os.path.join(self.__html_dir, file))
+                html_files.append(os.path.join(self.__html_dir, file))
         return html_files, js_files
 
     def __sort_js_html_files(self, html_files, js_files):
@@ -42,26 +44,27 @@ class HtmlBuilder:
             html_found = ''
             for html in html_files:
                 html_without_ending = html[:-HTML_FILENAME_END_CHAR_COUNT]
-                if js_without_ending == html_without_ending:
+                if compare_filenames_in_path(js_without_ending, html_without_ending):
                     html_found = html
                     break
             result.update({js_without_ending: (js, html_found)})
         return result
 
     def __inject_html_in_js(self, js_html_dict):
-        prepared_js =[]
+        prepared_js = []
         for key, paths in js_html_dict.items():
-            js = self.__load_file(self.__js_dir + paths[0])
+            js = self.__load_file(paths[0])
             if paths[1] is not '':
-                html = self.__load_file(self.__html_dir + paths[1])
-                js = JS_INJECT_TEMPLATE.format(key + 'Html', html) + '\n' + js
+                html = self.__load_file(paths[1])
+                js = JS_INJECT_TEMPLATE.format(string_after_last_slash(key) + 'Html', html) + '\n' + js
             prepared_js.append(js)
         return prepared_js
 
     def __inject_to_index_html(self, js_list):
-        full_js = ''
+        full_js = '\n' + BEGIN_SCRIPT_TAG + '\n'
         for js in js_list:
-            full_js = full_js + js
+            full_js = full_js + js + '\n'
+        full_js = full_js + END_SCRIPT_TAG + '\n'
         index_html = self.__load_file(self.__index_html_path)
         index_end_script_tag = index_html.find(END_SCRIPT_TAG) + len(END_SCRIPT_TAG)
         index_html_with_js = index_html[:index_end_script_tag] + full_js + index_html[index_end_script_tag:]
