@@ -1,4 +1,4 @@
-from widget import Widget
+from widget.widget import Widget
 
 
 class WidgetResolver:

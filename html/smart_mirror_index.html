@@ -67,6 +67,41 @@ body {
 const notSet = "<span style=\"font-size: 5em;\" class=\"glyphicon glyphicon-exclamation-sign\"></span>";
 const loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-size:50px\"></i></p>";
 
+class Registration {
+  constructor(widgetType, func) {
+    this.widgetType = widgetType;
+    this.func = func;
+  }
+}
+
+let registrationsAfterRestCall = [];
+
+function loadWidget(url, position, widgetType, queryString) {
+    const element = document.getElementById(position);
+    element.innerHTML = loading;
+    for(const r in registrations) {
+        if (r.name.localeCompare(widgetType)) {
+            restCall(url, r.func, position, queryString)
+        }
+    }
+}
+
+function restCall(url, evalFunction, position, queryString) {
+  const xhr  = new XMLHttpRequest();
+  if (params.localeCompare("")) {
+      url = url + "?" + queryString;
+  }
+  xhr.open('GET', url, true);
+  xhr.onload = function () {
+  	if (xhr.readyState === 4 && xhr.status === 200) {
+  	    evalFunction(JSON.parse(xhr.responseText), position);
+  	} else {
+  	    // show error
+    }
+  };
+  xhr.send(null);
+}
+
 function changeModeWidgets() {
   const divHide = document.getElementById("hide");
   if (divHide.style.display === "none") {
@@ -88,6 +123,17 @@ function changeModeIdle() {
 function changeMode() {// call from python
   changeModeWidgets();
   changeModeIdle();
+}
+
+function resetWidgets() { // call from python
+    let element = document.getElementById('1');
+    element.innerHTML = notSet;
+    element = document.getElementById('2');
+    element.innerHTML = notSet;
+    element = document.getElementById('3');
+    element.innerHTML = notSet;
+    element = document.getElementById('4');
+    element.innerHTML = notSet;
 }
 
 function getTime() {
