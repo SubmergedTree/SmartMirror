@@ -2,7 +2,7 @@ from api.rest import RestApi
 from database.dao import UserDao, PictureDao, WidgetDao, WidgetUserDao
 from recognition.camera import Camera
 from recognition.recognition import Scheduler
-from widget_resolver import WidgetResolver
+from widget.widget_resolver import WidgetResolver
 from view import View
 from root_dir import ROOT_DIR
 
