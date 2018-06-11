@@ -71,10 +71,10 @@ const loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-
 String.prototype.format = function() {
   let a = this;
   for (let k in arguments) {
-    a = a.replace("{" + k + "}", arguments[k])
+    a = a.replace("{" + k + "}", arguments[k]);
   }
-  return a
-}
+  return a;
+};
 
 class Registration {
   constructor(widgetType, func) {
@@ -85,12 +85,17 @@ class Registration {
 
 let registrations = [];
 
-function loadWidget(url, position, widgetType, queryString) {
+function register(widgetType, func) {
+    registrations.push(new Registration(widgetType, func));
+}
+
+function loadWidget(url, position, widgetType, context) {
     const element = document.getElementById(position);
     element.innerHTML = loading;
     for(const r in registrations) {
         if (r.name.localeCompare(widgetType)) {
-            restCall(url, r.func, position, queryString)
+            r.func(url, position, widgetType, context)
+            //restCall(url, r.func, position, queryString)
         }
     }
 }
