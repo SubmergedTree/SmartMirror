@@ -67,8 +67,8 @@ class WebEngineFacade:
 #    pass
 
 class View:
-    def __init__(self, fullscreen, which_web_engine, index_html_path):
-        self.__index_html_path = index_html_path
+    def __init__(self, fullscreen, which_web_engine, index_html):
+        self.__index_html = index_html
         self.__win, self.__layout = self.__setup_window()
         self.__web_engine = WebEngineFacade(which_web_engine, self.__layout)
 
@@ -80,9 +80,9 @@ class View:
         return window, layout
 
     def __load_index_html(self):
-        with open(self.__index_html_path) as fh:
-            html = fh.read()
-        self.__web_engine.engine.load_html(html)
+        # with open(self.__index_html_path) as fh:
+            # html = fh.read()
+        self.__web_engine.engine.load_html(self.__index_html)
 
     def show_window(self):
         self.__win.show()
@@ -94,9 +94,8 @@ class View:
     def reset_widgets(self):
         self.__web_engine.engine.eval_js('resetWidgets();')
 
-    def load_widget(self, position, widgetType, context):
-        exec_string = 'loadWidget({}, {}, {});'.format(position, widgetType, context)
-        self.__web_engine.engine.eval_js(exec_string)
+    def load_widget(self, url, position, widget_type, context):
+        self.__web_engine.engine.eval_js('loadWidget({}, {}, {});'.format(url, position, widget_type, context))
 
 
 # class HtmlFileLocation():

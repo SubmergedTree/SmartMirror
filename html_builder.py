@@ -8,6 +8,7 @@ HTML_FILENAME_END_CHAR_COUNT = len(HTML_FILENAME_END)
 JS_INJECT_TEMPLATE = 'const {} = \"{}\";'
 BEGIN_SCRIPT_TAG = '<script>'
 END_SCRIPT_TAG = '</script>'
+END_BODY_TAG = '</body>'
 
 
 class HtmlBuilder:
@@ -66,6 +67,6 @@ class HtmlBuilder:
             full_js = full_js + js + '\n'
         full_js = full_js + END_SCRIPT_TAG + '\n'
         index_html = self.__load_file(self.__index_html_path)
-        index_end_script_tag = index_html.find(END_SCRIPT_TAG) + len(END_SCRIPT_TAG)
+        index_end_script_tag = index_html.find(END_BODY_TAG) #+ len(END_SCRIPT_TAG)
         index_html_with_js = index_html[:index_end_script_tag] + full_js + index_html[index_end_script_tag:]
         return index_html_with_js
