@@ -67,6 +67,15 @@ body {
 const notSet = "<span style=\"font-size: 5em;\" class=\"glyphicon glyphicon-exclamation-sign\"></span>";
 const loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-size:50px\"></i></p>";
 
+
+String.prototype.format = function() {
+  let a = this;
+  for (let k in arguments) {
+    a = a.replace("{" + k + "}", arguments[k])
+  }
+  return a
+}
+
 class Registration {
   constructor(widgetType, func) {
     this.widgetType = widgetType;
@@ -74,7 +83,7 @@ class Registration {
   }
 }
 
-let registrationsAfterRestCall = [];
+let registrations = [];
 
 function loadWidget(url, position, widgetType, queryString) {
     const element = document.getElementById(position);
@@ -86,7 +95,7 @@ function loadWidget(url, position, widgetType, queryString) {
     }
 }
 
-function restCall(url, evalFunction, position, queryString) {
+function restCall(url, callback, position, queryString) {
   const xhr  = new XMLHttpRequest();
   if (params.localeCompare("")) {
       url = url + "?" + queryString;
@@ -94,7 +103,7 @@ function restCall(url, evalFunction, position, queryString) {
   xhr.open('GET', url, true);
   xhr.onload = function () {
   	if (xhr.readyState === 4 && xhr.status === 200) {
-  	    evalFunction(JSON.parse(xhr.responseText), position);
+  	    callback(JSON.parse(xhr.responseText), position);
   	} else {
   	    // show error
     }
@@ -134,6 +143,11 @@ function resetWidgets() { // call from python
     element.innerHTML = notSet;
     element = document.getElementById('4');
     element.innerHTML = notSet;
+}
+
+function changeWidget(id, html) {
+    let element = document.getElementById(id);
+    element.innerHTML = html;
 }
 
 function getTime() {
