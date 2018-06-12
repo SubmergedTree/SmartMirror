@@ -1,7 +1,7 @@
-register("ChuckNorisJoke", chuckNorisEval());
+register("ChuckNorisJoke", chuckNorisEval);
 
 function chuckNorisEval(url, position, widgetType, context) {
-    restCall(url, chuckNorisCallback, position, queryString);
+    restCall(url, chuckNorisCallback, position, context);
 }
 
 function chuckNorisCallback(json, position) {

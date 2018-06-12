@@ -67,6 +67,7 @@ body {
 const notSet = "<span style=\"font-size: 5em;\" class=\"glyphicon glyphicon-exclamation-sign\"></span>";
 const loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-size:50px\"></i></p>";
 
+changeModeIdle();
 
 String.prototype.format = function() {
   let a = this;
@@ -92,17 +93,16 @@ function register(widgetType, func) {
 function loadWidget(url, position, widgetType, context) {
     const element = document.getElementById(position);
     element.innerHTML = loading;
-    for(const r in registrations) {
-        if (r.name.localeCompare(widgetType)) {
-            r.func(url, position, widgetType, context)
-            //restCall(url, r.func, position, queryString)
-        }
+    for (let i = 0; i < registrations.length; i++) {
+           if(registrations[i].widgetType === widgetType) { // Is === stable for strings ?
+               registrations[i].func(url, position, widgetType, context)
+           }
     }
 }
 
 function restCall(url, callback, position, queryString) {
   const xhr  = new XMLHttpRequest();
-  if (params.localeCompare("")) {
+  if (queryString.localeCompare("")) {
       url = url + "?" + queryString;
   }
   xhr.open('GET', url, true);
