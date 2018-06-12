@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-from view import View, WebEngineFacade
+from view.view import View, WebEngineFacade
 import sys
 from root_dir import ROOT_DIR
 import time

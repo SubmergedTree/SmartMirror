@@ -1,6 +1,6 @@
 # This Test should check the functionality of all ui/view related modules
-from view import WebEngineFacade,View
-from html_builder import HtmlBuilder
+from view.view import WebEngineFacade,View
+from view.html_builder import HtmlBuilder
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import sys

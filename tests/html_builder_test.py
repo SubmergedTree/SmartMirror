@@ -1,5 +1,5 @@
 import unittest
-from html_builder import HtmlBuilder
+from view.html_builder import HtmlBuilder
 from root_dir import ROOT_DIR
 
 INDEX = ROOT_DIR + '/tests/test_html_builder_data/html/index.html'
