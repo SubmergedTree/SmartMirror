@@ -95,7 +95,8 @@ class View:
         self.__web_engine.engine.eval_js('resetWidgets();')
 
     def load_widget(self, url, position, widget_type, context):
-        self.__web_engine.engine.eval_js('loadWidget({}, {}, {});'.format(url, position, widget_type, context))
+        js = 'loadWidget(\'{}\', \'{}\', \'{}\', \'{}\');'.format(url, position, widget_type, context)
+        self.__web_engine.engine.eval_js(js)
 
 
 # class HtmlFileLocation():

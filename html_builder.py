@@ -1,5 +1,6 @@
 import os
 from util.path import compare_filenames_in_path, string_after_last_slash
+from util.string import to_string_with_escape_sequences
 
 JS_FILENAME_END = 'Eval.js'
 HTML_FILENAME_END = 'Widget.html'
@@ -57,7 +58,8 @@ class HtmlBuilder:
             js = self.__load_file(paths[0])
             if paths[1] is not '':
                 html = self.__load_file(paths[1])
-                js = JS_INJECT_TEMPLATE.format(string_after_last_slash(key) + 'Html', html) + '\n' + js
+                js = JS_INJECT_TEMPLATE.format(string_after_last_slash(key) + 'Html',
+                                               to_string_with_escape_sequences(html)) + '\n' + js
             prepared_js.append(js)
         return prepared_js
 
