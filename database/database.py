@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from pathlib import Path
 
 from util.logger import Logger
+from root_dir import ROOT_DIR
 
 
 Base = declarative_base()
@@ -49,7 +50,7 @@ def setup_database(optional_file_path=DB_FILENAME):
     global Session, db_engine
     
     def is_db_already_created():
-        to_test = Path(DB_FILENAME)
+        to_test = Path(optional_file_path)
         return to_test.is_file()
     
     def fill_widgets():
@@ -94,6 +95,6 @@ class SafeSession:
         return self.__session
 
    
-setup_database()  
+setup_database(ROOT_DIR + '/' + DB_FILENAME)
 
 
