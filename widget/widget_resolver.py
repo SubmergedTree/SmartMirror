@@ -9,7 +9,7 @@ class WidgetResolver:
 
     def process_widgets(self, username):
         widgets = []
-        mapping_table = self.__widget_user_dao.get_widget_position_context(username)
+        mapping_table = self.__widget_user_dao.get_mapping(username)
         for mapping in mapping_table:
             widgets.append(Widget(mapping.widget, self.__build_url(mapping.widget),
                                   mapping.position, mapping.context))
