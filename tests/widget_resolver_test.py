@@ -35,7 +35,7 @@ class APIKey:
 api_keys = {"GenericWidget": APIKey("APPID", "1234567890")}
 
 
-class HtmlBuilderTest(unittest.TestCase):
+class WidgetResolverTest(unittest.TestCase):
 
     def setUp(self):
         self.resolver = WidgetResolver(api_keys=api_keys,
