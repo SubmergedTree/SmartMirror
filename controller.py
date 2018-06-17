@@ -1,4 +1,4 @@
-from api.rest import RestApi, RestApiSignal
+from api.rest import RestApi, RestApiSignal, RestApiExp
 from database.dao import UserDao, PictureDao, WidgetDao, WidgetUserDao
 from recognition.camera import Camera, WhichCamera
 from recognition.recognition import Scheduler
@@ -55,7 +55,7 @@ class Controller(QRunnable):
         self.__new_pictures_signal = RestApiSignal()
         self.__new_pictures_signal.new_pictures.connect(self.__new_pictures)
 
-        #self.__rest_server = RestServer(self.__new_pictures_signal.new_pictures) # TODO make server cancelable, port as argument
+        self.__rest_server = RestServer(self.__new_pictures_signal.new_pictures) # TODO make server cancelable, port as argument
 
         self.__camera = Camera(self.__cascade_path, self.__config.camera)
         self.__recognizer_scheduler = RecognizerScheduler(self.__user_dao, self.__picture_dao,
@@ -66,6 +66,7 @@ class Controller(QRunnable):
                                                 widget_user_dao=self.__widget_user_dao, widget_dao=self.__widget_dao)
 
         #self.__thread_pool.start(self.__rest_server)
+        self.__rest_server.start()
 
     def run(self): # For non blocking ui
         while self.__is_running:
@@ -74,6 +75,7 @@ class Controller(QRunnable):
     def shut_down(self):
         print("shut down")
         self.__recognizer_scheduler.shut_down()
+        self.__rest_server.shut_down()
         #try:
         #    self.__rest_server.shut_down()
         #except RuntimeError as e:
@@ -126,10 +128,10 @@ def set_up():
 
 
 if __name__ == '__main__':
-    thread_pool = QThreadPool()
+    thread_pool = QThreadPool() # TODO use single thread with moveToThread instead of threadpool
     app, view, api_key_dict, config, cascade = set_up()
     controller = Controller(cascade_path=cascade, config=config, api_key_dict=api_key_dict, view=view,
-                            thread_pool=thread_pool, RestServer=RestApi,
+                            thread_pool=thread_pool, RestServer=RestApiExp,
                             RecognizerScheduler=Scheduler, Camera=Camera, WidgetResolver=WidgetResolver,
                             UserDao=UserDao, PictureDao=PictureDao, WidgetDao=WidgetDao, WidgetUserDao=WidgetUserDao)
     thread_pool.start(controller)

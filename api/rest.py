@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from werkzeug import secure_filename
 from werkzeug.serving import make_server
-from PyQt5.QtCore import QRunnable, QObject, pyqtSignal
+from PyQt5.QtCore import QRunnable, QObject, pyqtSignal, QThread
 from database.database import User, SafeSession, Picture
 from util.logger import Logger
 from datetime import datetime
@@ -30,12 +30,24 @@ class RestApiSignal(QObject):
 new_picture_signal = None
 
 
+class RestApiExp(QThread):
+    def __init__(self, signal):
+        super(RestApiExp, self).__init__()
+        global new_picture_signal
+        new_picture_signal = signal
+
+    def run(self):
+        app.run(host='0.0.0.0', port=PORT, debug=False)
+
+    def shut_down(self):
+        super(RestApiExp, self).terminate() # TODO secure this
+
 class RestApi(QRunnable): 
     def __init__(self, signal):
         super(RestApi, self).__init__()
         global new_picture_signal
         new_picture_signal = signal
-        
+
     def run(self):
         app.run(host='0.0.0.0', port=PORT, debug=False)
 
@@ -123,4 +135,3 @@ def update_widgets():
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"health": "healthy"})
-
