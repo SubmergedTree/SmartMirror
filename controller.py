@@ -53,35 +53,40 @@ class Controller(QRunnable):
         self.__new_pictures_signal = RestApiSignal()
         self.__new_pictures_signal.new_pictures.connect(self.__new_pictures)
 
-        self.__rest_server = RestServer(self.__new_pictures_signal.new_pictures)
-        #self.__recognizer_scheduler = RecognizerScheduler()
-        #self.__camera = Camera()
-        #self.__widget_resolver = WidgetResolver()
+        #self.__rest_server = RestServer(self.__new_pictures_signal.new_pictures)
 
-        self.__thread_pool.start(self.__rest_server)
+        self.__camera = Camera(self.__cascade_path, self.__config.camera)
+        self.__recognizer_scheduler = RecognizerScheduler(self.__user_dao, self.__picture_dao,
+                                                          self.__camera, self.__cascade_path, self.__is_learning_cb,
+                                                          self.__finished_learning_cb, self.__user_recognized_callback)
+        self.__widget_resolver = WidgetResolver(api_keys=self.__api_key_dict,
+                                                widget_user_dao=self.__widget_user_dao, widget_dao=self.__widget_dao)
 
-    def run(self):
+        #self.__thread_pool.start(self.__rest_server)
+
+    def run(self): # For non blocking ui
         while self.__is_running:
             pass
 
     def shut_down(self):
         print("shut down")
-        self.__is_running = False
-        try:
-            self.__rest_server.shut_down()
-        except RuntimeError as e:
-            print("error")
+        self.__recognizer_scheduler.shut_down()
+        #try:
+        #    self.__rest_server.shut_down()
+        #except RuntimeError as e:
+        #    print("error")
             # TODO: logging
+        self.__is_running = False
         self.__thread_pool.waitForDone()
 
     def __is_learning_cb(self):
-        pass
+        print("is learning")
 
     def __finished_learning_cb(self):
-        pass
+        print("finished learning")
 
     def __user_recognized_callback(self, username):
-        pass
+        print("user recognized {}".format(username))
 
     def __new_pictures(self, pictures):
         print("new pictures")

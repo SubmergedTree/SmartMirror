@@ -144,8 +144,6 @@ class Scheduler(QObject):
     @pyqtSlot(list, object)
     def finished_learning(self, l, s):
         self.finished_learning_callback()
-        #print(s)
-        #print(l)
         self.face_recognizer =s
         l.insert(0, "")
         self.users = l
