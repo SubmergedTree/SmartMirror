@@ -1,11 +1,10 @@
 from flask import Flask, jsonify, request
 from werkzeug import secure_filename
-from werkzeug.serving import make_server
 from PyQt5.QtCore import QRunnable, QObject, pyqtSignal, QThread
 from database.database import User, SafeSession, Picture
 from util.logger import Logger
 from datetime import datetime
-
+from util.guarded_executor import GuardedExecutor
 # TODO: need to catch exception and return suitable status when errors occur.
 # e.g. server is knocked out by creating duplicated user (it restarts itself but client receives a 500)
 
@@ -23,6 +22,9 @@ class HttpStatus:
     INTERNALSERVERERROR = 500
 
 
+guarded_executor = None
+
+
 class RestApiSignal(QObject):
     new_pictures = pyqtSignal()
 
@@ -33,14 +35,16 @@ new_picture_signal = None
 class RestApiExp(QThread):
     def __init__(self, signal):
         super(RestApiExp, self).__init__()
-        global new_picture_signal
+        global new_picture_signal, guarded_executor
         new_picture_signal = signal
+        guarded_executor = GuardedExecutor(lambda: super(RestApiExp, self).terminate())
 
     def run(self):
         app.run(host='0.0.0.0', port=PORT, debug=False)
 
     def shut_down(self):
-        super(RestApiExp, self).terminate() # TODO secure this
+        guarded_executor.try_to_exec()
+
 
 class RestApi(QRunnable): 
     def __init__(self, signal):
@@ -60,6 +64,7 @@ class RestApi(QRunnable):
 
 @app.route("/getUsers", methods=["GET"])
 def get_users():
+    guarded_executor.lock()
     Logger.info('request: getUsers.')
     user_list = []
     with SafeSession() as safe_session:  
@@ -70,11 +75,13 @@ def get_users():
             user_dict['name'] = user.name
             user_list.append(user_dict)
         safe_session.commit()
+    guarded_executor.unlock()
     return jsonify(user_list), HttpStatus.SUCCESS
 
 
 @app.route("/newUser", methods=["POST"])
 def new_user():
+    guarded_executor.lock()
     Logger.info('request: newUser.')
     username = request.form['username']
     prename = request.form['prename']
@@ -82,12 +89,14 @@ def new_user():
     user = User(username=username, prename=prename, name=name) #TODO: check if user already exists
     with SafeSession() as safe_session:
         safe_session.add(user)   
-        safe_session.commit()  
+        safe_session.commit()
+    guarded_executor.unlock()
     return jsonify('User successfully created'), HttpStatus.CREATED 
 
 
 @app.route("/deleteUser", methods=["DELETE"])
 def delete_user():
+    guarded_executor.lock()
     Logger.info('request: deleteUser.')
     username = request.form['username']
     with SafeSession() as safe_session:
@@ -96,11 +105,13 @@ def delete_user():
             return jsonify('User: ' + username + ' does not exist'), HttpStatus.NOTFOUND
         safe_session.delete(user_to_delete)
         safe_session.commit()
+    guarded_executor.unlock()
     return jsonify('User: ' + username + ' deleted'), HttpStatus.SUCCESS
 
 
 @app.route("/addPicture", methods=["POST"])
 def add_picture():
+    guarded_executor.lock()
     Logger.info('request: addPictures.')
     username = request.form['username']
     Logger.info(username)
@@ -117,21 +128,28 @@ def add_picture():
         safe_session.add(picture_to_store)
         safe_session.commit()
         new_picture_signal.emit()
+    guarded_executor.unlock()
     return jsonify('Picture successfully added'), HttpStatus.CREATED 
    
 
 @app.route("/getWidgets", methods=["GET"])
 def get_widgets():
+    guarded_executor.lock()
     Logger.info('request: getWidgets.')
+    guarded_executor.unlock()
     return jsonify(("username", "email"))
 
 
 @app.route("/updateWidgets", methods=["POST"])
 def update_widgets():
+    guarded_executor.lock()
     Logger.info('request: updateWidgets.')
+    guarded_executor.unlock()
     return jsonify(("username", "email"))
 
 
 @app.route("/health", methods=["GET"])
 def health():
+    guarded_executor.lock()
+    guarded_executor.unlock()
     return jsonify({"health": "healthy"})
