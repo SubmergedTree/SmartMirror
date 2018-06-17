@@ -88,7 +88,7 @@ class Controller(QRunnable):
     def __user_recognized_callback(self, username):
         print("user recognized {}".format(username))
 
-    def __new_pictures(self, pictures):
+    def __new_pictures(self):
         print("new pictures")
 
 
