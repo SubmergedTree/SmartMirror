@@ -60,7 +60,8 @@ class Controller(QRunnable):
         self.__camera = Camera(self.__cascade_path, self.__config.camera)
         self.__recognizer_scheduler = RecognizerScheduler(self.__user_dao, self.__picture_dao,
                                                           self.__camera, self.__cascade_path, self.__is_learning_cb,
-                                                          self.__finished_learning_cb, self.__user_recognized_callback)
+                                                          self.__finished_learning_cb,self.__no_training_data_cb,
+                                                          self.__user_recognized_callback)
         self.__widget_resolver = WidgetResolver(api_keys=self.__api_key_dict,
                                                 widget_user_dao=self.__widget_user_dao, widget_dao=self.__widget_dao)
 
@@ -86,6 +87,9 @@ class Controller(QRunnable):
 
     def __finished_learning_cb(self):
         print("finished learning") # TODO remove learning hint
+
+    def __no_training_data_cb(self):
+        print("no training data")
 
     def __user_recognized_callback(self, username):
         print("user recognized {}".format(username))

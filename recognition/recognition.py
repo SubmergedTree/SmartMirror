@@ -22,6 +22,7 @@ def detect_face_from_image(image, cascade_classifier_path):
 class LearnerSignals(QObject):
     finished_learning = pyqtSignal(list, object)
     learning_error = pyqtSignal(Exception)
+    no_training_data = pyqtSignal()
 
 
 class RecognizerSignals(QObject):
@@ -40,6 +41,7 @@ class Learner(QRunnable):
     def run(self):
         users = self.__get_users()
         if not users:
+            self.signals.no_training_data.emit()
             return
         faces, labels = self.__get_labels_faces(users)
         face_recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -115,7 +117,7 @@ class Recognizer(QRunnable):
 
 class Scheduler(QObject):
     def __init__(self, user_dao, picture_dao, camera, cascade,
-                 is_learning_callback, finished_learning_callback, user_recognized_callback):
+                 is_learning_callback, finished_learning_callback, no_training_data_cb, user_recognized_callback):
         super(Scheduler, self).__init__()
         self.user_dao = user_dao
         self.picture_dao = picture_dao
@@ -137,6 +139,7 @@ class Scheduler(QObject):
         self.is_learning_callback = is_learning_callback
         self.finished_learning_callback = finished_learning_callback
         self.user_recognized_callback = user_recognized_callback
+        self.no_training_data_callback = no_training_data_cb
 
         self.schedule()
 
@@ -166,6 +169,10 @@ class Scheduler(QObject):
     def recognizer_halt(self):
         print("recognizer halt")
 
+    @pyqtSlot()
+    def no_training_data(self):
+        self.no_training_data_callback()
+
     def learn(self):
         self.queue.put(Learner(self.cascade, LearnerSignals(), self.user_dao, self.picture_dao))
         if self.recognizer:
@@ -180,6 +187,7 @@ class Scheduler(QObject):
             current_learner = self.queue.get()
             current_learner.signals.finished_learning.connect(self.finished_learning)
             current_learner.signals.learning_error.connect(self.learning_error)
+            current_learner.signals.no_training_data.connect(self.no_training_data)
             self.threadpool.start(current_learner)
        # elif self.recognizer:
         else:
