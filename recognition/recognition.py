@@ -99,16 +99,17 @@ class Recognizer(QRunnable):
 
     def run(self):
         has_found = False
-        while has_found is False and self.recognize is True: # TODO:should we check captured_image if it is none ?
+        while has_found is False and self.recognize is True:
             captured_image = self.camera.capture_face()
             has_found, found_user = self.__predict(captured_image, self.users)
             if has_found:
+                self.camera.stop()
                 self.signals.user_recognized.emit(found_user.username)
         if not self.recognize:
+            self.camera.stop()
             self.signals.recognizer_halt.emit()
 
     def stop_recognizer(self):
-        self.camera.stop()
         self.recognize = False
 
 
@@ -120,7 +121,7 @@ class Scheduler(QObject):
         self.picture_dao = picture_dao
 
         self.threadpool = QThreadPool()
-        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
+        #print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
         self.queue = queue.Queue()
 
@@ -157,7 +158,6 @@ class Scheduler(QObject):
         self.panic = True
         raise e
 
-
     @pyqtSlot(str)
     def recognized_user(self, username):
         #print("recognized user")
@@ -191,4 +191,6 @@ class Scheduler(QObject):
             self.threadpool.start(self.recognizer)
 
     def shut_down(self):
+        if self.recognizer:
+            self.recognizer.stop_recognizer()
         self.threadpool.waitForDone()

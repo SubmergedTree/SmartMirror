@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from werkzeug import secure_filename
-from PyQt5.QtCore import QRunnable
+from werkzeug.serving import make_server
+from PyQt5.QtCore import QRunnable, QObject, pyqtSignal
 from database.database import User, SafeSession, Picture
 from util.logger import Logger
 from datetime import datetime
@@ -12,7 +13,7 @@ app = Flask(__name__)
 PORT = 5000
 
 
-class HttpStatus():
+class HttpStatus:
     SUCCESS = 200
     CREATED = 201
     BADREQUEST = 400
@@ -22,29 +23,28 @@ class HttpStatus():
     INTERNALSERVERERROR = 500
 
 
+class RestApiSignal(QObject):
+    new_pictures = pyqtSignal()
+
+
 new_picture_signal = None
 
 
 class RestApi(QRunnable): 
     def __init__(self, signal):
-        global comon_signal
-        new_picture_signal = signal 
+        super(RestApi, self).__init__()
+        global new_picture_signal
+        new_picture_signal = signal
         
     def run(self):
-        app.run(host='0.0.0.0', port=PORT, debug=False)  
+        app.run(host='0.0.0.0', port=PORT, debug=False)
 
-# class RestApiThread(QThread):
-#     def __init__(self): 
-#         QThread.__init__(self)
-#         signal_util = self
-#         Logger.info('Rest API is ready.')
-#         
-#     def __del__(self):
-#         self.wait()    
-#     
-#     def run(self):
-#         app.run(host='0.0.0.0', port=PORT, debug=False)    
-    
+    def shut_down(self):
+        func_s_d = request.environ.get('werkzeug.server.shutdown')
+        if func_s_d is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        func_s_d()
+
 
 @app.route("/getUsers", methods=["GET"])
 def get_users():
@@ -118,3 +118,9 @@ def get_widgets():
 def update_widgets():
     Logger.info('request: updateWidgets.')
     return jsonify(("username", "email"))
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"health": "healthy"})
+

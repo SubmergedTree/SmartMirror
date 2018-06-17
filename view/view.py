@@ -70,7 +70,10 @@ class View:
     def __init__(self, fullscreen, which_web_engine, index_html):
         self.__index_html = index_html
         self.__win, self.__layout = self.__setup_window()
-        self.__web_engine = WebEngineFacade(which_web_engine, self.__layout)
+        try:
+            self.__web_engine = WebEngineFacade(which_web_engine, self.__layout)
+        except CouldNotImportException as e:
+            raise e  # TODO logging
 
     def __setup_window(self):
         window = QWidget()

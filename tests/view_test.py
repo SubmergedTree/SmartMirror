@@ -11,6 +11,7 @@ index_html_test_path = ROOT_DIR + '/tests/test_data/test.html'
 
 view = None
 
+# TODO test is broken !!!
 
 class ControllerMock(QRunnable):
     def __init__(self, view):
@@ -20,7 +21,6 @@ class ControllerMock(QRunnable):
     def run(self):
         time.sleep(3)
         self.__view.change_ui_mode()
-        #view.load_index_html()  # need signal slot
         while True:
             pass
 
