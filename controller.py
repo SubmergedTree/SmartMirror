@@ -9,7 +9,7 @@ from load_config import ConfigLoader
 from root_dir import ROOT_DIR
 
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QThreadPool, QRunnable, pyqtSlot
+from PyQt5.QtCore import QThreadPool, QRunnable, QTimer
 import sys
 
 
@@ -28,6 +28,8 @@ DEFAULT_CAMERA = ConfigValues.Generic
 DEFAULT_SERVER_PORT = 5000
 DEFAULT_MAPPING = {"standard": ConfigValues.Standard, "legacy": ConfigValues.Legacy,
                    "generic": ConfigValues.Generic, "pi": ConfigValues.Pi}
+
+WIDGET_SHOW_TIME = 300  # TODO make configurable
 
 JS_DIR = ROOT_DIR + '/js'
 HTML_DIR = ROOT_DIR + '/html'
@@ -48,12 +50,12 @@ class Controller(QRunnable):
         self.__user_dao = UserDao()
         self.__picture_dao = PictureDao()
         self.__widget_dao = WidgetDao()
-        self.__widget_user_dao = WidgetUserDao()
+        self.__widget_user_dao = WidgetUserDao() # TODO implement daos
 
         self.__new_pictures_signal = RestApiSignal()
         self.__new_pictures_signal.new_pictures.connect(self.__new_pictures)
 
-        #self.__rest_server = RestServer(self.__new_pictures_signal.new_pictures)
+        #self.__rest_server = RestServer(self.__new_pictures_signal.new_pictures) # TODO make server cancelable, port as argument
 
         self.__camera = Camera(self.__cascade_path, self.__config.camera)
         self.__recognizer_scheduler = RecognizerScheduler(self.__user_dao, self.__picture_dao,
@@ -80,17 +82,34 @@ class Controller(QRunnable):
         self.__thread_pool.waitForDone()
 
     def __is_learning_cb(self):
-        print("is learning")
+        print("is learning") # TODO view shows hint
 
     def __finished_learning_cb(self):
-        print("finished learning")
+        print("finished learning") # TODO remove learning hint
 
     def __user_recognized_callback(self, username):
         print("user recognized {}".format(username))
+        self.__view.change_ui_mod()
+        widgets = self.__widget_resolver.process_widgets(username)
+        for widget in widgets:
+            self.__view.load_widget(widget.url, widget.position, widget.widget, widget.context)
+        timer = QTimer()
+        timer.timeout.connect(self.__on_show_widget_finished())
+        timer.setSingleShot(True)
+        timer.start(900)
+
+    def __on_show_widget_finished(self):
+        self.__view.reset_widgets()
+        self.__view.change_ui_mod()
+        self.__recognizer_scheduler.schedule()
 
     def __new_pictures(self):
         print("new pictures")
+        self.__recognizer_scheduler.learn()
 
+    def __new_user(self): # TODO add signal / slot in rest server
+        print("new user")
+        self.__recognizer_scheduler.learn()
 
 def set_up():
     cascade = ROOT_DIR + FRONTAL_FACE_PATH

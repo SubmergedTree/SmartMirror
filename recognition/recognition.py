@@ -105,7 +105,7 @@ class Recognizer(QRunnable):
             if has_found:
                 self.camera.stop()
                 self.signals.user_recognized.emit(found_user.username)
-        if not self.recognize:
+        if self.recognize is False:
             self.camera.stop()
             self.signals.recognizer_halt.emit()
 
