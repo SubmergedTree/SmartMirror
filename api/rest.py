@@ -1,10 +1,11 @@
 from flask import Flask, jsonify, request
 from werkzeug import secure_filename
 from PyQt5.QtCore import QRunnable, QObject, pyqtSignal, QThread
-from database.database import User, SafeSession, Picture
+from database.database import User, SafeSession, Picture, WidgetUser, Widget
 from util.logger import Logger
 from datetime import datetime
 from util.guarded_executor import GuardedExecutor
+from api.rest_impl import RestBroker
 # TODO: need to catch exception and return suitable status when errors occur.
 # e.g. server is knocked out by creating duplicated user (it restarts itself but client receives a 500)
 
@@ -30,6 +31,12 @@ class RestApiSignal(QObject):
 
 
 new_picture_signal = None
+
+rest_broker = RestBroker(SafeSession=SafeSession,
+                         User=User,
+                         Picture=Picture,
+                         Widget=Widget,
+                         WidgetUser=WidgetUser)
 
 
 class RestApiExp(QThread):
@@ -66,32 +73,21 @@ class RestApi(QRunnable):
 def get_users():
     guarded_executor.lock()
     Logger.info('request: getUsers.')
-    user_list = []
-    with SafeSession() as safe_session:  
-        for user in safe_session.get_session().query(User):
-            user_dict = {}
-            user_dict['username'] = user.username
-            user_dict['prename'] = user.prename
-            user_dict['name'] = user.name
-            user_list.append(user_dict)
-        safe_session.commit()
+    user_list = rest_broker.get_users()
     guarded_executor.unlock()
     return jsonify(user_list), HttpStatus.SUCCESS
 
 
-@app.route("/newUser", methods=["POST"])
+@app.route("/newUser", methods=["POST"])  # TODO 1 picture needed
 def new_user():
     guarded_executor.lock()
     Logger.info('request: newUser.')
     username = request.form['username']
     prename = request.form['prename']
     name = request.form['name']
-    user = User(username=username, prename=prename, name=name) #TODO: check if user already exists
-    with SafeSession() as safe_session:
-        safe_session.add(user)   
-        safe_session.commit()
-    guarded_executor.unlock()
-    return jsonify('User successfully created'), HttpStatus.CREATED 
+    success = rest_broker.new_user(username, prename, name)
+    return (jsonify('User successfully created'), HttpStatus.CREATED) if success \
+        else (jsonify('Duplicated User'), HttpStatus.CONFLICT)
 
 
 @app.route("/deleteUser", methods=["DELETE"])
@@ -99,14 +95,10 @@ def delete_user():
     guarded_executor.lock()
     Logger.info('request: deleteUser.')
     username = request.form['username']
-    with SafeSession() as safe_session:
-        user_to_delete = safe_session.get_session().query(User).filter_by(username=username).first() 
-        if user_to_delete == None:
-            return jsonify('User: ' + username + ' does not exist'), HttpStatus.NOTFOUND
-        safe_session.delete(user_to_delete)
-        safe_session.commit()
+    success = rest_broker.delete_user(username)
     guarded_executor.unlock()
-    return jsonify('User: ' + username + ' deleted'), HttpStatus.SUCCESS
+    return (jsonify('User successfully deleted'), HttpStatus.CREATED) if success \
+        else (jsonify('User does not exist'), HttpStatus.CONFLICT)
 
 
 @app.route("/addPicture", methods=["POST"])
