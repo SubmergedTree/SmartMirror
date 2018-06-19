@@ -13,16 +13,6 @@ app = Flask(__name__)
 PORT = 5000
 
 
-class HttpStatus:
-    SUCCESS = 200
-    CREATED = 201
-    BADREQUEST = 400
-    FORBIDDEN = 403
-    NOTFOUND = 404
-    CONFLICT = 409
-    INTERNALSERVERERROR = 500
-
-
 guarded_executor = None
 
 

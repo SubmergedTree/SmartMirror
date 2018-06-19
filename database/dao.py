@@ -28,23 +28,31 @@ class UserDao:
 
     def delete_user_by_username(self, username):
         with SafeSession() as safe_session:
-            user_to_delete = safe_session.get_session().query(User).filter_by(username=username).first()
-            if user_to_delete:
-                safe_session.delete(user_to_delete)
-                safe_session.commit()
-                return True
-            else:
-                return False
+            try:
+                user_to_delete = safe_session.get_session().query(User).filter_by(username=username).first()
+                if user_to_delete:
+                    safe_session.delete(user_to_delete)
+                    safe_session.commit()
+                    return True
+                else:
+                    return False
+            except (SQLAlchemyError, DBAPIError) as e:
+                safe_session.rollback()
+                raise DBException(str)
 
     def insert_user(self, username, prename, name):
         with SafeSession() as safe_session:
-            if safe_session.get_session().query(User).filter_by(username=username).first() is None:
-                user = User(username=username, prename=prename, name=name)
-                safe_session.add(user)
-                safe_session.commit()
-                return True
-            else:
-                return False
+            try:
+                if safe_session.get_session().query(User).filter_by(username=username).first() is None:
+                    user = User(username=username, prename=prename, name=name)
+                    safe_session.add(user)
+                    safe_session.commit()
+                    return True
+                else:
+                    return False
+            except (SQLAlchemyError, DBAPIError) as e:
+                safe_session.rollback()
+                raise DBException(str)
 
 
 class PictureDao:
@@ -60,13 +68,17 @@ class PictureDao:
 
     def add_picture(self, username, image_path):
         with SafeSession() as safe_session:
-            if safe_session.get_session().query(Picture).filter_by(username=username).first() is None:
-                picture = Picture(username=username, image_path=image_path)
-                safe_session.add(picture)
-                safe_session.commit()
-                return True
-            else:
-                return False
+            try:
+                if safe_session.get_session().query(Picture).filter_by(username=username).first() is None:
+                    picture = Picture(username=username, image_path=image_path)
+                    safe_session.add(picture)
+                    safe_session.commit()
+                    return True
+                else:
+                    return False
+            except (SQLAlchemyError, DBAPIError) as e:
+                safe_session.rollback()
+                raise DBException(str)
 
 
 class WidgetDao:
@@ -92,23 +104,31 @@ class WidgetDao:
 
     def add_widget(self, widget, base_url):
         with SafeSession() as safe_session:
-            if safe_session.get_session().query(Widget).filter_by(widget=widget).first() is None:
-                widget = Widget(widget=widget, base_url=base_url)
-                safe_session.add(widget)
-                safe_session.commit()
-                return True
-            else:
-                return False
+            try:
+                if safe_session.get_session().query(Widget).filter_by(widget=widget).first() is None:
+                    widget = Widget(widget=widget, base_url=base_url)
+                    safe_session.add(widget)
+                    safe_session.commit()
+                    return True
+                else:
+                    return False
+            except (SQLAlchemyError, DBAPIError) as e:
+                safe_session.rollback()
+                raise DBException(str)
 
     def delete_widget(self, widget):
         with SafeSession() as safe_session:
-            widget_to_delete = safe_session.get_session().query(Widget).filter_by(widget=widget).first()
-            if widget_to_delete:
-                safe_session.delete(widget_to_delete)
-                safe_session.commit()
-                return True
-            else:
-                return False
+            try:
+                widget_to_delete = safe_session.get_session().query(Widget).filter_by(widget=widget).first()
+                if widget_to_delete:
+                    safe_session.delete(widget_to_delete)
+                    safe_session.commit()
+                    return True
+                else:
+                    return False
+            except (SQLAlchemyError, DBAPIError) as e:
+                safe_session.rollback()
+                raise DBException(str)
 
 
 class WidgetUserDao:
@@ -126,18 +146,26 @@ class WidgetUserDao:
     def update(self, widget, username, position, context):  # TODO refactor lazy implementation
         self.delete(username, position)
         with SafeSession() as safe_session:
-            widget_user = WidgetUser(widget=widget, username=username, position=position, context=context)
-            safe_session.add(widget_user)
-            safe_session.commit()
+            try:
+                widget_user = WidgetUser(widget=widget, username=username, position=position, context=context)
+                safe_session.add(widget_user)
+                safe_session.commit()
+            except (SQLAlchemyError, DBAPIError) as e:
+                safe_session.rollback()
+                raise DBException(str)
 
     def delete(self, username, position):
         with SafeSession() as safe_session:
-            mapping_to_delete = safe_session.get_session().query(WidgetUser)\
-                .filter(WidgetUser.username == username and WidgetUser.position == position)\
-                .first()
-            if mapping_to_delete:
-                safe_session.delete(mapping_to_delete)
-                safe_session.commit()
-                return True
-            else:
-                return False
+            try:
+                mapping_to_delete = safe_session.get_session().query(WidgetUser)\
+                    .filter(WidgetUser.username == username and WidgetUser.position == position)\
+                    .first()
+                if mapping_to_delete:
+                    safe_session.delete(mapping_to_delete)
+                    safe_session.commit()
+                    return True
+                else:
+                    return False
+            except (SQLAlchemyError, DBAPIError) as e:
+                safe_session.rollback()
+                raise DBException(str)
