@@ -56,8 +56,8 @@ class Controller(QRunnable):
         self.__new_pictures_signal = RestImplSignal()
         self.__new_pictures_signal.new_pictures.connect(self.__new_pictures)
 
-        self.__rest_server = RestServer(RestBroker(UserDao=UserDao, PictureDao=PictureDao, WidgetDao=WidgetDao,
-                                                   WidgetUserDao=WidgetUserDao, DBException=DBException,
+        self.__rest_server = RestServer(RestBroker(UserDao=UserDao(), PictureDao=PictureDao(), WidgetDao=WidgetDao(),
+                                                   WidgetUserDao=WidgetUserDao(), DBException=DBException,
                                                    new_pictures_signal=self.__new_pictures_signal.new_pictures,
                                                    image_base_path=IMAGE_BASE_PATH), DEFAULT_SERVER_PORT)
 

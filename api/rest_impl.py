@@ -50,7 +50,12 @@ class GetUsers(RestImplBase):
         Logger.info('request: getUsers')
         try:
             user_list = self._UserDao.get_all_user()
-            return user_list, HttpStatus.SUCCESS
+            user_list_serializable = []
+            for user in user_list:
+                user_list_serializable.append({'username': user.username,
+                                               'prename': user.prename,
+                                               'name': user.prename})
+            return user_list_serializable, HttpStatus.SUCCESS
         except self._DBException:
             return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
 
@@ -110,7 +115,12 @@ class GetWidgets(RestImplBase):
     def __call__(self):
         Logger.info('request: getWidgets')
         try:
-            return self._WidgetDao.get_widgets(), HttpStatus.SUCCESS
+            widgets = self._WidgetDao.get_widgets()
+            widget_list_serializable = []
+            for widget in widgets:
+                widget_list_serializable.append({'widget': widget.username,
+                                                 'base_url': widget.base_url})
+            return widget_list_serializable, HttpStatus.SUCCESS
         except self._DBException:
             return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
 
