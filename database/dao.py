@@ -12,7 +12,7 @@ class UserDao:
         assigned_user = None
         with SafeSession() as safe_session:
                 try:
-                    assigned_user = safe_session.get_session().query(Picture).filter_by(username=username)
+                    assigned_user = safe_session.get_session().query(Picture).filter_by(username=username).first()
                 except (SQLAlchemyError, DBAPIError) as e:
                     raise DBException(str(e))
         return assigned_user

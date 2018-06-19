@@ -1,5 +1,10 @@
 from datetime import datetime
 from util.logger import Logger
+from PyQt5.QtCore import pyqtSignal, QObject
+
+
+class RestImplSignal(QObject):
+    new_pictures = pyqtSignal()
 
 
 class HttpStatus:
@@ -16,11 +21,12 @@ INTERNAL_SERVER_ERROR_MSG = '500 - Internal Server Error'
 
 
 class RestBroker:
-    def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException):
+    def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException, new_pictures_signal, image_base_path):
         self.get_users = GetUsers(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
         self.new_user = NewUser(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
         self.delete_user = DeleteUser(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
-        self.add_picture = AddPictures(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
+        self.add_picture = AddPictures(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException,
+                                       new_pictures_signal, image_base_path)
         self.get_widgets = GetWidgets(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
         self.update_widget_of_person = UpdateWidgetOfPerson(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
         self.new_widget = NewWidget(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
@@ -76,13 +82,25 @@ class DeleteUser(RestImplBase):
 
 
 class AddPictures(RestImplBase):
-    def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException):
+    def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException, new_pictures_signal, image_base_path):
         super(AddPictures, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
+        self.__new_pictures_signal = new_pictures_signal
+        self.__image_base_path = image_base_path
 
-    def __call__(self, username, pictures):
+    def __call__(self, username, pictures, save_func): # TODO PATH
         Logger.info('request: addPictures; username: {}'.format(username))
-        for picture in pictures:
-            image_name = username + str(datetime.now()) # TODO
+        try:
+            if self._UserDao.get_user_by_username(username):
+                for picture in pictures:
+                    image_path = username + str(datetime.now())
+                    self._PictureDao.add_picture(username, image_path)
+                    save_func(picture, image_path)
+                self.__new_pictures_signal.emit()
+                return "Pictures successfully added", HttpStatus.SUCCESS
+            else:
+                return "User {} does not exist".format(username), HttpStatus.NOTFOUND
+        except self._DBException:
+            return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
 
 
 class GetWidgets(RestImplBase):

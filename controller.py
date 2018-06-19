@@ -1,5 +1,6 @@
-from api.rest import RestApi, RestApiSignal, RestApiExp
-from database.dao import UserDao, PictureDao, WidgetDao, WidgetUserDao
+from api.rest import RestApi
+from api.rest_impl import RestBroker, RestImplSignal
+from database.dao import UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException
 from recognition.camera import Camera, WhichCamera
 from recognition.recognition import Scheduler
 from widget.widget_resolver import WidgetResolver
@@ -34,7 +35,7 @@ WIDGET_SHOW_TIME = 300  # TODO make configurable
 JS_DIR = ROOT_DIR + '/js'
 HTML_DIR = ROOT_DIR + '/html'
 HTML_INDEX = HTML_DIR + '/smart_mirror_index.html'
-
+IMAGE_BASE_PATH = ''
 
 class Controller(QRunnable):
     def __init__(self,cascade_path, config, api_key_dict, view, thread_pool, RestServer, RecognizerScheduler, Camera, WidgetResolver,
@@ -50,12 +51,15 @@ class Controller(QRunnable):
         self.__user_dao = UserDao()
         self.__picture_dao = PictureDao()
         self.__widget_dao = WidgetDao()
-        self.__widget_user_dao = WidgetUserDao() # TODO implement daos
+        self.__widget_user_dao = WidgetUserDao()
 
-        self.__new_pictures_signal = RestApiSignal()
+        self.__new_pictures_signal = RestImplSignal()
         self.__new_pictures_signal.new_pictures.connect(self.__new_pictures)
 
-        self.__rest_server = RestServer(self.__new_pictures_signal.new_pictures) # TODO make server cancelable, port as argument
+        self.__rest_server = RestServer(RestBroker(UserDao=UserDao, PictureDao=PictureDao, WidgetDao=WidgetDao,
+                                                   WidgetUserDao=WidgetUserDao, DBException=DBException,
+                                                   new_pictures_signal=self.__new_pictures_signal.new_pictures,
+                                                   image_base_path=IMAGE_BASE_PATH), DEFAULT_SERVER_PORT)
 
         self.__camera = Camera(self.__cascade_path, self.__config.camera)
         self.__recognizer_scheduler = RecognizerScheduler(self.__user_dao, self.__picture_dao,
