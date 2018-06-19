@@ -19,7 +19,7 @@ class HttpStatus:
 
 INTERNAL_SERVER_ERROR_MSG = '500 - Internal Server Error'
 
-
+# TODO write daos in lower case
 class RestBroker:
     def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException, new_pictures_signal, image_base_path):
         self.get_users = GetUsers(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
