@@ -41,7 +41,7 @@ class GetUsers(RestImplBase):
         super(GetUsers, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
 
     def __call__(self):
-        Logger.info('request: getUsers.')
+        Logger.info('request: getUsers')
         try:
             user_list = self._UserDao.get_all_user()
             return user_list, HttpStatus.SUCCESS
@@ -54,6 +54,7 @@ class NewUser(RestImplBase):
         super(NewUser, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
 
     def __call__(self, username, prename, name):
+        Logger.info('request: newUser; username: {}'.format(username))
         try:
             res = self._UserDao.insert_user(username, prename, name)
             return ('New User created', HttpStatus.CREATED) if res else ('User already exists', HttpStatus.CONFLICT)
@@ -66,6 +67,7 @@ class DeleteUser(RestImplBase):
         super(DeleteUser, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
 
     def __call__(self, username):
+        Logger.info('request: deleteUser; username: {}'.format(username))
         try:
             res = self._UserDao.delete_user_by_username(username)
             return ('User successfully deleted', HttpStatus.SUCCESS) if res else ('User not found', HttpStatus.NOTFOUND)
@@ -78,6 +80,7 @@ class AddPictures(RestImplBase):
         super(AddPictures, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
 
     def __call__(self, username, pictures):
+        Logger.info('request: addPictures; username: {}'.format(username))
         for picture in pictures:
             image_name = username + str(datetime.now()) # TODO
 
@@ -87,6 +90,7 @@ class GetWidgets(RestImplBase):
         super(GetWidgets, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
 
     def __call__(self):
+        Logger.info('request: getWidgets')
         try:
             return self._WidgetDao.get_widgets(), HttpStatus.SUCCESS
         except self._DBException:
@@ -98,6 +102,7 @@ class UpdateWidgetOfPerson(RestImplBase):
         super(UpdateWidgetOfPerson, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
 
     def __call__(self, username, widget, position, context):
+        Logger.info('request: updateWidgetsOfPerson; username: {}; widget: {}'.format(username, widget))
         try:
             self._WidgetUserDao.update(widget, username, position, context)
             return 'Widget Updated', HttpStatus.SUCCESS
@@ -110,6 +115,7 @@ class NewWidget(RestImplBase):
         super(NewWidget, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
 
     def __call__(self, widget, base_url):
+        Logger.info('request: newWidget; widget: {}; base_url: {}'.format(widget, base_url))
         try:
             res = self._WidgetDao.add_widget(widget, base_url)
             return ('Widget Created', HttpStatus.CREATED) if res else ('Widget already exists', HttpStatus.CONFLICT)
@@ -125,4 +131,5 @@ class Status(RestImplBase):
         super(Status, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
 
     def __call__(self):
+        Logger.info('request: status; username')
         return True  # TODO (object which stores state)
