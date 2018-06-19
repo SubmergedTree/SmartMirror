@@ -135,7 +135,7 @@ if __name__ == '__main__':
     thread_pool = QThreadPool() # TODO use single thread with moveToThread instead of threadpool
     app, view, api_key_dict, config, cascade = set_up()
     controller = Controller(cascade_path=cascade, config=config, api_key_dict=api_key_dict, view=view,
-                            thread_pool=thread_pool, RestServer=RestApiExp,
+                            thread_pool=thread_pool, RestServer=RestApi,
                             RecognizerScheduler=Scheduler, Camera=Camera, WidgetResolver=WidgetResolver,
                             UserDao=UserDao, PictureDao=PictureDao, WidgetDao=WidgetDao, WidgetUserDao=WidgetUserDao)
     thread_pool.start(controller)
