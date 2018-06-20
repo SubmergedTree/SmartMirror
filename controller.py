@@ -57,9 +57,9 @@ class Controller(QRunnable):
         self.rest_impl_signals.new_pictures.connect(self.__relearn)
         self.rest_impl_signals.users_changed.connect(self.__relearn)
 
-        self.__rest_server = RestServer(RestBroker(UserDao=self.__user_dao, PictureDao=self.__picture_dao,
-                                                   WidgetDao=self.__widget_dao,
-                                                   WidgetUserDao=self.__widget_user_dao, DBException=DBException,
+        self.__rest_server = RestServer(RestBroker(user_dao=self.__user_dao, picture_dao=self.__picture_dao,
+                                                   widget_dao=self.__widget_dao,
+                                                   widget_user_dao=self.__widget_user_dao, DBException=DBException,
                                                    new_pictures_signal=self.rest_impl_signals.new_pictures,
                                                    users_changed_signal=self.rest_impl_signals.users_changed,
                                                    image_base_path=IMAGE_BASE_PATH), DEFAULT_SERVER_PORT)
