@@ -41,9 +41,9 @@ class Learner(QRunnable):
     def run(self):
         try:
             users = self.user_dao.get_all_user()
-            #users[:] = [user for user in users if
-            #            not self.picture_dao.get_number_of_pictures_per_username(user.username) > 0]
-            if not users:
+            users[:] = [user for user in users if
+                        self.picture_dao.get_number_of_pictures_per_username(user.username) > 0]
+            if len(users) == 0:
                 self.signals.no_training_data.emit()
                 return
         except DBException as e:
@@ -143,17 +143,18 @@ class Scheduler(QObject):
 
 
     @pyqtSlot(list, object)
-    def finished_learning(self, l, s):
+    def finished_learning(self, user, f_r):
+        self.is_learning = False
         self.finished_learning_callback()
-        self.face_recognizer =s
-        l.insert(0, "")
-        self.users = l
-        #self.recognizer = Recognizer(RecognizerSignals(), self.face_recognizer, self.users, self.camera)
+        self.face_recognizer = f_r
+        user.insert(0, "")
+        self.users = user
         self.schedule()
 
     @pyqtSlot()
     def learning_error(self, e):
         print("learning error!")
+        self.is_learning = False
         self.panic = True
         raise e
 
@@ -181,13 +182,13 @@ class Scheduler(QObject):
         if self.panic is True or self.is_learning:
             return
         if not self.queue.empty():
+            self.is_learning = True
             self.is_learning_callback()
             current_learner = self.queue.get()
             current_learner.signals.finished_learning.connect(self.finished_learning)
             current_learner.signals.learning_error.connect(self.learning_error)
             current_learner.signals.no_training_data.connect(self.no_training_data)
             self.threadpool.start(current_learner)
-       # elif self.recognizer:
         else:
             self.recognizer = Recognizer(RecognizerSignals(), self.face_recognizer, self.users, self.camera)
             self.recognizer.signals.user_recognized.connect(self.recognized_user)
