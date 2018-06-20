@@ -39,23 +39,21 @@ class Learner(QRunnable):
         self.__cascade_classifier_path = cascade
 
     def run(self):
-        users = self.__get_users()
-        if not users:
-            self.signals.no_training_data.emit()
+        try:
+            users = self.user_dao.get_all_user()
+            users[:] = [user for user in users if
+                        not self.picture_dao.get_number_of_pictures_per_username(user.username) > 0]
+            if not users:
+                self.signals.no_training_data.emit()
+                return
+        except DBException as e:
+            self.signals.learning_error.emit(e)
             return
         faces, labels = self.__get_labels_faces(users)
         face_recognizer = cv2.face.LBPHFaceRecognizer_create()
         face_recognizer.train(faces, np.array(labels))
 
         self.signals.finished_learning.emit(users, face_recognizer)  # Return the result of the processing
-
-    def __get_users(self):
-        users = None
-        try:
-            users = self.user_dao.get_all_user()
-        except DBException as e:
-            self.signals.learning_error.emit(e)
-        return users
 
     def __get_picture_paths_by_username(self, username):
         picture_paths = None
