@@ -57,6 +57,15 @@ class UserDao:
 
 class PictureDao:
 
+    def get_number_of_pictures_per_username(self, username):
+        number_of = []
+        with SafeSession() as safe_session:
+            try:
+                number_of = safe_session.get_session().query(Picture).filter_by(username=username).count()
+            except (SQLAlchemyError, DBAPIError) as e:
+                raise DBException(str(e))
+        return number_of
+
     def get_paths_by_username(self, username):
         path_list = []
         with SafeSession() as safe_session:
