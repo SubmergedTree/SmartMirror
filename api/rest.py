@@ -47,7 +47,10 @@ def new_user():
     username = request.form['username']
     prename = request.form['prename']
     name = request.form['name']
-    result, status = rest_impl_broker.new_user(username, prename, name)
+    image = request.files['image']
+    result, status = rest_impl_broker.new_user(username, prename,
+                                               name, image,
+                                               lambda img, name: img.save(secure_filename(name)))
     return jsonify(result), status
 
 

@@ -5,6 +5,7 @@ from PyQt5.QtCore import pyqtSignal, QObject
 
 class RestImplSignal(QObject):
     new_pictures = pyqtSignal()
+    users_changed = pyqtSignal()
 
 
 class HttpStatus:
@@ -21,10 +22,10 @@ INTERNAL_SERVER_ERROR_MSG = '500 - Internal Server Error'
 
 # TODO write daos in lower case
 class RestBroker:
-    def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException, new_pictures_signal, image_base_path):
+    def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException, new_pictures_signal, users_changed_signal,image_base_path):
         self.get_users = GetUsers(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
-        self.new_user = NewUser(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
-        self.delete_user = DeleteUser(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
+        self.new_user = NewUser(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException, users_changed_signal)
+        self.delete_user = DeleteUser(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException, users_changed_signal)
         self.add_picture = AddPictures(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException,
                                        new_pictures_signal, image_base_path)
         self.get_widgets = GetWidgets(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
@@ -61,26 +62,38 @@ class GetUsers(RestImplBase):
 
 
 class NewUser(RestImplBase):
-    def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException):
+    def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException, users_changed_signal):
         super(NewUser, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
+        self.__users_changed_signal = users_changed_signal
 
-    def __call__(self, username, prename, name):
+    def __call__(self, username, prename, name, image, save_func):
         Logger.info('request: newUser; username: {}'.format(username))
         try:
             res = self._UserDao.insert_user(username, prename, name)
-            return ('New User created', HttpStatus.CREATED) if res else ('User already exists', HttpStatus.CONFLICT)
+            if not res:
+                return 'User already exists', HttpStatus.CONFLICT
+            result, status = self._PictureDao.add_picture(username, [image], save_func)
+            if status == HttpStatus.NOTFOUND:
+                return 'Could not save image, user not found', HttpStatus.NOTFOUND
+            elif status == HttpStatus.INTERNALSERVERERROR:
+                return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
+            else:
+                self.__users_changed_signal.emit()
+                return ('New User created', HttpStatus.CREATED)
         except self._DBException:
             return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
 
 
 class DeleteUser(RestImplBase):
-    def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException):
+    def __init__(self, UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException, users_changed_signal):
         super(DeleteUser, self).__init__(UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException)
+        self.__users_changed_signal = users_changed_signal
 
     def __call__(self, username):
         Logger.info('request: deleteUser; username: {}'.format(username))
         try:
             res = self._UserDao.delete_user_by_username(username)
+            self.__users_changed_signal.emit()
             return ('User successfully deleted', HttpStatus.SUCCESS) if res else ('User not found', HttpStatus.NOTFOUND)
         except self._DBException:
             return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR

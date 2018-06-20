@@ -53,13 +53,15 @@ class Controller(QRunnable):
         self.__widget_dao = WidgetDao()
         self.__widget_user_dao = WidgetUserDao()
 
-        self.__new_pictures_signal = RestImplSignal()
-        self.__new_pictures_signal.new_pictures.connect(self.__new_pictures)
+        self.rest_impl_signals = RestImplSignal()
+        self.rest_impl_signals.new_pictures.connect(self.__relearn)
+        self.rest_impl_signals.users_changed.connect(self.__relearn)
 
         self.__rest_server = RestServer(RestBroker(UserDao=self.__user_dao, PictureDao=self.__picture_dao,
                                                    WidgetDao=self.__widget_dao,
                                                    WidgetUserDao=self.__widget_user_dao, DBException=DBException,
-                                                   new_pictures_signal=self.__new_pictures_signal.new_pictures,
+                                                   new_pictures_signal=self.rest_impl_signals.new_pictures,
+                                                   users_changed_signal=self.rest_impl_signals.users_changed,
                                                    image_base_path=IMAGE_BASE_PATH), DEFAULT_SERVER_PORT)
 
         self.__camera = Camera(self.__cascade_path, self.__config.camera)
@@ -118,8 +120,7 @@ class Controller(QRunnable):
         print("new pictures")
         self.__recognizer_scheduler.learn()
 
-    def __new_user(self): # TODO add signal / slot in rest server
-        print("new user")
+    def __relearn(self):
         self.__recognizer_scheduler.learn()
 
 def set_up():
