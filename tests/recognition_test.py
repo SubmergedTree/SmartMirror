@@ -48,6 +48,9 @@ class CameraMock:
     def capture_face(self):
         return camera_result_1_gray
 
+    def stop(self):
+        print("camera stop")
+
 
 class CameraMockUnknownFace:
     def __init__(self):
@@ -55,6 +58,9 @@ class CameraMockUnknownFace:
 
     def capture_face(self):
         return camera_result_2_gray
+
+    def stop(self):
+        print("camera stop")
 
 
 #### Test ####
@@ -98,7 +104,10 @@ def test_learn_recognize():
             if cb1 and cb2:
                 results['test_learn_recognize'] = 'success'
 
-    s = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
+    def no_training_data_cb():
+        pass
+
+    s = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
 
 
 def test_learn_recognize_learn_recognize():
@@ -142,7 +151,10 @@ def test_learn_recognize_learn_recognize():
                 if cb1_1 and cb1_2 and cb1_3 and cb2_1 and cb2_2 and cb2_3 and cb1_3 and cb2_3:
                     results['test_learn_recognize_learn_recognize'] = 'success'
 
-    s2 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
+    def no_training_data_cb():
+        pass
+
+    s = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
 
 
 def test_learn_recognize_recognize():
@@ -187,8 +199,10 @@ def test_learn_recognize_recognize():
                 if cb1_1 and cb1_2 and cb1_3 and not cb2_1 and not cb2_2 and cb2_3 and cb1_3 and cb2_3:
                     results['test_learn_recognize_recognize'] = 'success'
 
+    def no_training_data_cb():
+        pass
 
-    s3 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
+    s = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
 
 
 def test_learn_learn_recognize():  # TODO
@@ -234,8 +248,10 @@ def test_learn_learn_recognize():  # TODO
                     pass
                     #results['test_learn_recognize_recognize'] = 'success'
 
+    def no_training_data_cb():
+        pass
 
-    s4 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
+    s = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
 
 
 def test_try_to_recognize_unknown_face():
@@ -252,7 +268,10 @@ def test_try_to_recognize_unknown_face():
         global test_try_to_recognize_unknown_face_user_recognized
         test_try_to_recognize_unknown_face_user_recognized = True
 
-    s5 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMockUnknownFace(),cascade, is_learning_cb, finished_learning_cb, user_recognized_cb)
+    def no_training_data_cb():
+        pass
+
+    s = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
 
 
 
@@ -266,10 +285,10 @@ class TestWindow(QMainWindow):
         w = QWidget()
         w.setLayout(layout)
         self.setCentralWidget(w)
-        test_learn_recognize()
-        test_learn_recognize_learn_recognize()
-        test_learn_recognize_recognize()
-        test_try_to_recognize_unknown_face()
+       # test_learn_recognize()
+        #test_learn_recognize_learn_recognize()
+        #test_learn_recognize_recognize()
+        #test_try_to_recognize_unknown_face()
         self.show()
 
 
@@ -280,8 +299,8 @@ def on_quit():
     print("quit")
 
 app = QApplication([])
-t = TestWindow()
 print("INSTRUCTION: Wait until test finished.")
+t = TestWindow()
 timer = QTimer()
 timer.timeout.connect(lambda: t.close())
 timer.setSingleShot(True)

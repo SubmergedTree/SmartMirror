@@ -41,8 +41,8 @@ class Learner(QRunnable):
     def run(self):
         try:
             users = self.user_dao.get_all_user()
-            users[:] = [user for user in users if
-                        not self.picture_dao.get_number_of_pictures_per_username(user.username) > 0]
+            #users[:] = [user for user in users if
+            #            not self.picture_dao.get_number_of_pictures_per_username(user.username) > 0]
             if not users:
                 self.signals.no_training_data.emit()
                 return
