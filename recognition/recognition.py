@@ -10,6 +10,8 @@ import numpy as np
 
 
 def detect_face_from_image(image, cascade_classifier_path):
+    #if not image:
+    #    return None, None
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     face_cascade = cv2.CascadeClassifier(cascade_classifier_path)
     faces = face_cascade.detectMultiScale(gray_image, scaleFactor=1.2, minNeighbors=5)  # TODO remove magic numbers
@@ -50,6 +52,9 @@ class Learner(QRunnable):
             self.signals.learning_error.emit(e)
             return
         faces, labels = self.__get_labels_faces(users)
+        if len(faces) == 0 or len(labels) == 0:
+            self.signals.no_training_data.emit()
+            return
         face_recognizer = cv2.face.LBPHFaceRecognizer_create()
         face_recognizer.train(faces, np.array(labels))
 
