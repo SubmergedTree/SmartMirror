@@ -119,7 +119,11 @@ def test_learn_recognize():
     def no_training_data_cb():
         pass
 
-    s = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
+    def learning_error_cb():
+        pass
+
+    s = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb,
+                  finished_learning_cb, no_training_data_cb, user_recognized_cb, learning_error_cb)
 
 
 def test_learn_recognize_learn_recognize():
@@ -166,7 +170,11 @@ def test_learn_recognize_learn_recognize():
     def no_training_data_cb():
         pass
 
-    s2 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
+    def learning_error_cb():
+        pass
+
+    s2 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb,
+                   finished_learning_cb, no_training_data_cb, user_recognized_cb, learning_error_cb)
 
 
 def test_learn_recognize_recognize():
@@ -214,7 +222,11 @@ def test_learn_recognize_recognize():
     def no_training_data_cb():
         pass
 
-    s3 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
+    def learning_error_cb():
+        pass
+
+    s3 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb,
+                   finished_learning_cb, no_training_data_cb, user_recognized_cb, learning_error_cb)
 
 
 def test_learn_learn_recognize():  # TODO
@@ -263,7 +275,11 @@ def test_learn_learn_recognize():  # TODO
     def no_training_data_cb():
         pass
 
-    s4 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
+    def learning_error_cb():
+        pass
+
+    s4 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMock(),cascade, is_learning_cb, finished_learning_cb,
+                   no_training_data_cb, user_recognized_cb, learning_error_cb)
 
 
 def test_no_user_data():
@@ -281,7 +297,11 @@ def test_no_user_data():
     def no_training_data_cb():
         results['test_no_user_data'] = 'success'
 
-    s6 = Scheduler(UserDaoMock(), PictureDaoMockNoData(),CameraMock(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
+    def learning_error_cb():
+        pass
+
+    s6 = Scheduler(UserDaoMock(), PictureDaoMockNoData(),CameraMock(),cascade, is_learning_cb, finished_learning_cb,
+                   no_training_data_cb, user_recognized_cb, learning_error_cb)
 
 
 def test_try_to_recognize_unknown_face():
@@ -301,7 +321,10 @@ def test_try_to_recognize_unknown_face():
     def no_training_data_cb():
         pass
 
-    s5 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMockUnknownFace(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb)
+    def learning_error_cb():
+        pass
+
+    s5 = Scheduler(UserDaoMock(), PictureDaoMock(),CameraMockUnknownFace(),cascade, is_learning_cb, finished_learning_cb, no_training_data_cb, user_recognized_cb, learning_error_cb)
 
 
 

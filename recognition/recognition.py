@@ -115,7 +115,9 @@ class Recognizer(QRunnable):
 
 class Scheduler(QObject):
     def __init__(self, user_dao, picture_dao, camera, cascade,
-                 is_learning_callback, finished_learning_callback, no_training_data_cb, user_recognized_callback):
+                 is_learning_callback, finished_learning_callback,
+                 no_training_data_cb, user_recognized_callback,
+                 learning_error_cb):
         super(Scheduler, self).__init__()
         self.user_dao = user_dao
         self.picture_dao = picture_dao
@@ -138,6 +140,7 @@ class Scheduler(QObject):
         self.finished_learning_callback = finished_learning_callback
         self.user_recognized_callback = user_recognized_callback
         self.no_training_data_callback = no_training_data_cb
+        self.learning_error_callback = learning_error_cb
 
         self.schedule()
 
@@ -156,7 +159,7 @@ class Scheduler(QObject):
         print("learning error!")
         self.is_learning = False
         self.panic = True
-        raise e
+        self.learning_error_callback()
 
     @pyqtSlot(str)
     def recognized_user(self, username):
