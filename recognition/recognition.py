@@ -10,6 +10,8 @@ import numpy as np
 
 
 def detect_face_from_image(image, cascade_classifier_path):
+    #if not image:
+    #    return None, None
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     face_cascade = cv2.CascadeClassifier(cascade_classifier_path)
     faces = face_cascade.detectMultiScale(gray_image, scaleFactor=1.2, minNeighbors=5)  # TODO remove magic numbers
@@ -39,23 +41,24 @@ class Learner(QRunnable):
         self.__cascade_classifier_path = cascade
 
     def run(self):
-        users = self.__get_users()
-        if not users:
-            self.signals.no_training_data.emit()
+        try:
+            users = self.user_dao.get_all_user()
+            users[:] = [user for user in users if
+                        self.picture_dao.get_number_of_pictures_per_username(user.username) > 0]
+            if len(users) == 0:
+                self.signals.no_training_data.emit()
+                return
+        except DBException as e:
+            self.signals.learning_error.emit(e)
             return
         faces, labels = self.__get_labels_faces(users)
+        if len(faces) == 0 or len(labels) == 0:
+            self.signals.no_training_data.emit()
+            return
         face_recognizer = cv2.face.LBPHFaceRecognizer_create()
         face_recognizer.train(faces, np.array(labels))
 
         self.signals.finished_learning.emit(users, face_recognizer)  # Return the result of the processing
-
-    def __get_users(self):
-        users = None
-        try:
-            users = self.user_dao.get_all_user()
-        except DBException as e:
-            self.signals.learning_error.emit(e)
-        return users
 
     def __get_picture_paths_by_username(self, username):
         picture_paths = None
@@ -117,7 +120,9 @@ class Recognizer(QRunnable):
 
 class Scheduler(QObject):
     def __init__(self, user_dao, picture_dao, camera, cascade,
-                 is_learning_callback, finished_learning_callback, no_training_data_cb, user_recognized_callback):
+                 is_learning_callback, finished_learning_callback,
+                 no_training_data_cb, user_recognized_callback,
+                 learning_error_cb):
         super(Scheduler, self).__init__()
         self.user_dao = user_dao
         self.picture_dao = picture_dao
@@ -140,24 +145,26 @@ class Scheduler(QObject):
         self.finished_learning_callback = finished_learning_callback
         self.user_recognized_callback = user_recognized_callback
         self.no_training_data_callback = no_training_data_cb
+        self.learning_error_callback = learning_error_cb
 
         self.schedule()
 
 
     @pyqtSlot(list, object)
-    def finished_learning(self, l, s):
+    def finished_learning(self, user, f_r):
+        self.is_learning = False
         self.finished_learning_callback()
-        self.face_recognizer =s
-        l.insert(0, "")
-        self.users = l
-        #self.recognizer = Recognizer(RecognizerSignals(), self.face_recognizer, self.users, self.camera)
+        self.face_recognizer = f_r
+        user.insert(0, "")
+        self.users = user
         self.schedule()
 
     @pyqtSlot()
     def learning_error(self, e):
         print("learning error!")
+        self.is_learning = False
         self.panic = True
-        raise e
+        self.learning_error_callback()
 
     @pyqtSlot(str)
     def recognized_user(self, username):
@@ -183,13 +190,13 @@ class Scheduler(QObject):
         if self.panic is True or self.is_learning:
             return
         if not self.queue.empty():
+            self.is_learning = True
             self.is_learning_callback()
             current_learner = self.queue.get()
             current_learner.signals.finished_learning.connect(self.finished_learning)
             current_learner.signals.learning_error.connect(self.learning_error)
             current_learner.signals.no_training_data.connect(self.no_training_data)
             self.threadpool.start(current_learner)
-       # elif self.recognizer:
         else:
             self.recognizer = Recognizer(RecognizerSignals(), self.face_recognizer, self.users, self.camera)
             self.recognizer.signals.user_recognized.connect(self.recognized_user)

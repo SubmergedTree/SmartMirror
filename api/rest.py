@@ -50,7 +50,7 @@ def new_user():
     image = request.files['image']
     result, status = rest_impl_broker.new_user(username, prename,
                                                name, image,
-                                               lambda img, name: img.save(secure_filename(name)))
+                                               save_image)
     return jsonify(result), status
 
 
@@ -75,7 +75,7 @@ def add_pictures():
     for x in range(0, number_of):
         images.append(request.files['images{}'.format(x)])
 
-    result, status = rest_impl_broker.add_picture(username, images, lambda img, name: img.save(secure_filename(name)))
+    result, status = rest_impl_broker.add_picture(username, images, save_image)
     return result, status
 
     # image = request.files['image']
@@ -120,3 +120,9 @@ def status():
     result, status = rest_impl_broker.status()
     guarded_executor.unlock()
     return jsonify(result), status
+
+
+def save_image(img, name):
+    path = secure_filename(name)
+    img.save(path)
+    return path

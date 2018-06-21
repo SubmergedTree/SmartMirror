@@ -68,7 +68,8 @@ class Controller(QRunnable):
         self.__recognizer_scheduler = RecognizerScheduler(self.__user_dao, self.__picture_dao,
                                                           self.__camera, self.__cascade_path, self.__is_learning_cb,
                                                           self.__finished_learning_cb,self.__no_training_data_cb,
-                                                          self.__user_recognized_callback)
+                                                          self.__user_recognized_callback,
+                                                          self.__learning_error_cb)
         self.__widget_resolver = WidgetResolver(api_keys=self.__api_key_dict,
                                                 widget_user_dao=self.__widget_user_dao, widget_dao=self.__widget_dao)
 
@@ -122,6 +123,10 @@ class Controller(QRunnable):
 
     def __relearn(self):
         self.__recognizer_scheduler.learn()
+
+    def __learning_error_cb(self):
+        pass
+
 
 def set_up():
     cascade = ROOT_DIR + FRONTAL_FACE_PATH

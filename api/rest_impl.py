@@ -24,7 +24,6 @@ INTERNAL_SERVER_ERROR_MSG = '500 - Internal Server Error'
 class RestBroker:
     def __init__(self, user_dao, picture_dao, widget_dao, widget_user_dao, DBException, new_pictures_signal, users_changed_signal, image_base_path):
         self.get_users = GetUsers(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
-        self.new_user = NewUser(user_dao, picture_dao, widget_dao, widget_user_dao, DBException, users_changed_signal)
         self.delete_user = DeleteUser(user_dao, picture_dao, widget_dao, widget_user_dao, DBException, users_changed_signal)
         self.add_picture = AddPictures(user_dao, picture_dao, widget_dao, widget_user_dao, DBException,
                                        new_pictures_signal, image_base_path)
@@ -32,6 +31,8 @@ class RestBroker:
         self.update_widget_of_person = UpdateWidgetOfPerson(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
         self.new_widget = NewWidget(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
         self.status = Status(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
+        self.new_user = NewUser(user_dao, picture_dao, widget_dao, widget_user_dao, DBException, self.add_picture, users_changed_signal)
+
 
 
 class RestImplBase:
@@ -62,9 +63,10 @@ class GetUsers(RestImplBase):
 
 
 class NewUser(RestImplBase):
-    def __init__(self, user_dao, picture_dao, widget_dao, widget_user_dao, DBException, users_changed_signal):
+    def __init__(self, user_dao, picture_dao, widget_dao, widget_user_dao, DBException, add_picture,users_changed_signal):
         super(NewUser, self).__init__(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
         self.__users_changed_signal = users_changed_signal
+        self.__add_picture = add_picture
 
     def __call__(self, username, prename, name, image, save_func):
         Logger.info('request: newUser; username: {}'.format(username))
@@ -72,7 +74,7 @@ class NewUser(RestImplBase):
             res = self._user_dao.insert_user(username, prename, name)
             if not res:
                 return 'User already exists', HttpStatus.CONFLICT
-            result, status = self._picture_dao.add_picture(username, [image], save_func)
+            result, status = self.__add_picture(username, [image], save_func)
             if status == HttpStatus.NOTFOUND:
                 return 'Could not save image, user not found', HttpStatus.NOTFOUND
             elif status == HttpStatus.INTERNALSERVERERROR:
@@ -111,8 +113,8 @@ class AddPictures(RestImplBase):
             if self._user_dao.get_user_by_username(username):
                 for picture in pictures:
                     image_path = username + str(datetime.now())
-                    self._picture_dao.add_picture(username, image_path)
-                    save_func(picture, image_path)
+                    path = save_func(picture, image_path)
+                    self._picture_dao.add_picture(username, path)
                 self.__new_pictures_signal.emit()
                 return "Pictures successfully added", HttpStatus.SUCCESS
             else:
@@ -173,4 +175,4 @@ class Status(RestImplBase):
 
     def __call__(self):
         Logger.info('request: status; username')
-        return True  # TODO (object which stores state)
+        return {"status:" "up"}  # TODO (object which stores state)
