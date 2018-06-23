@@ -6,7 +6,7 @@ except:
     found_picamera_module = False
 import time
 import cv2
-
+from util.logger import Logger
 
 SCALE_FACTOR = 1.2
 MIN_NEIGHBORS = 5
@@ -46,7 +46,7 @@ class BaseCamera:
             face_cascade = cv2.CascadeClassifier(self.__cascade)
             self._faces = face_cascade.detectMultiScale(self._gray_image, scaleFactor=SCALE_FACTOR, minNeighbors=MIN_NEIGHBORS)
         except cv2.error:
-            print("exception caught")
+            Logger.error("Exception caught in _detect_faces in BaseCamera.")
             pass
 
 class CameraPi(BaseCamera):
@@ -79,7 +79,7 @@ class CameraCV(BaseCamera):
         while not self.stop:
             ret, frame = self.__capture_device.read()
             if not ret:
-                print("not ret")
+                Logger.warn("Reading from CV Camera failed. Rebuild capture device and retry")
                 self.__capture_device = cv2.VideoCapture(0)  # dirty hack to reset camera when an error occurred
                 continue
             self._detect_faces(frame)
@@ -95,18 +95,23 @@ class Camera:
     def __init__(self, cascade, which_camera):
         global found_picamera_module
         if which_camera == WhichCamera.CV:
+            Logger.info("using cv camera")
             self.__camera = CameraCV(cascade, cv2.VideoCapture(0))
         elif which_camera == WhichCamera.PI:
             if found_picamera_module:
+                Logger.info("using pi camera")
                 self.__camera = CameraPi(cascade, PiCamera())
             else:
+                Logger.error("attempt to use pi camera but it is not supported on this device " +
+                           "or the library is not installed")
                 raise PiCameraNotSupportedException()
 
     def capture_face(self):
         return self.__camera.capture_face()
 
     def stop(self):
-        print("Camera stop")
+        pass # QUESTION: does this break PiCamera ?
+        # print("Camera stop")
         #self.__camera.stop = True # stopping camera chrashes the whole appplication.
 
 

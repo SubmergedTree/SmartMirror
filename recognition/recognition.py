@@ -138,7 +138,9 @@ class Scheduler(QObject):
         self.recognizer = None
         self.panic = False
         self.is_learning = False
+        self.is_recognizing = False
         self.face_recognizer = False
+        self.is_shut_down = False
         self.users = None
         self.camera = camera
         self.cascade = cascade
@@ -154,6 +156,7 @@ class Scheduler(QObject):
 
     @pyqtSlot(list, object)
     def finished_learning(self, user, f_r):
+        Logger.info('Finished learning')
         self.is_learning = False
         self.finished_learning_callback()
         self.face_recognizer = f_r
@@ -163,36 +166,42 @@ class Scheduler(QObject):
 
     @pyqtSlot()
     def learning_error(self, e):
-        print("learning error!")
+        Logger.warn('Learning error')
         self.is_learning = False
         self.panic = True
         self.learning_error_callback()
 
     @pyqtSlot(str)
     def recognized_user(self, username):
-        #print("recognized user")
-        #print(username)
+        Logger.info("user: {} recognized".format(username))
+        self.is_recognizing = False
         self.user_recognized_callback(username)
 
     @pyqtSlot()
     def recognizer_halt(self):
-        print("recognizer halt")
+        Logger.info("recognizer halt")
+        self.is_recognizing = False
+        if not self.is_shut_down:
+            self.schedule()
 
     @pyqtSlot()
     def no_training_data(self):
+        Logger.warn('No training data')
         self.is_learning = False
         self.no_training_data_callback()
 
     def learn(self):
+        Logger.info('Learn request')
         self.queue.put(Learner(self.cascade, LearnerSignals(), self.user_dao, self.picture_dao))
         if self.recognizer:
             self.recognizer.stop_recognizer()
         self.schedule()
 
     def schedule(self):
-        if self.panic is True or self.is_learning:
+        if self.panic is True or self.is_learning or self.is_recognizing:
             return
         if not self.queue.empty():
+            Logger.info('Is learning')
             self.is_learning = True
             self.is_learning_callback()
             current_learner = self.queue.get()
@@ -201,12 +210,16 @@ class Scheduler(QObject):
             current_learner.signals.no_training_data.connect(self.no_training_data)
             self.threadpool.start(current_learner)
         else:
+            Logger.info('Is recognizing')
+            self.is_recognizing = True
             self.recognizer = Recognizer(RecognizerSignals(), self.face_recognizer, self.users, self.camera)
             self.recognizer.signals.user_recognized.connect(self.recognized_user)
             self.recognizer.signals.recognizer_halt.connect(self.recognizer_halt)
             self.threadpool.start(self.recognizer)
 
     def shut_down(self):
+        Logger.info('Shut down face recognition')
+        self.is_shut_down = True
         if self.recognizer:
             self.recognizer.stop_recognizer()
         self.threadpool.waitForDone()
