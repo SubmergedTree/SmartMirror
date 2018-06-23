@@ -180,6 +180,7 @@ class Scheduler(QObject):
 
     @pyqtSlot()
     def no_training_data(self):
+        self.is_learning = False
         self.no_training_data_callback()
 
     def learn(self):
