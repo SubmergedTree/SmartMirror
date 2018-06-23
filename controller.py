@@ -73,7 +73,8 @@ class Controller(QRunnable):
         self.__widget_resolver = WidgetResolver(api_keys=self.__api_key_dict,
                                                 widget_user_dao=self.__widget_user_dao, widget_dao=self.__widget_dao)
 
-        #self.__thread_pool.start(self.__rest_server)
+        self.__show_widgte_finished_timer = None
+
         self.__rest_server.start()
 
     def run(self): # For non blocking ui
@@ -107,12 +108,13 @@ class Controller(QRunnable):
  #       widgets = self.__widget_resolver.process_widgets(username)
  #       for widget in widgets:
  #           self.__view.load_widget(widget.url, widget.position, widget.widget, widget.context)
-        timer = QTimer()
-        timer.timeout.connect(self.__on_show_widget_finished())
-        timer.setSingleShot(True)
-        timer.start(900)
+        self.__show_widgte_finished_timer = QTimer()
+        self.__show_widgte_finished_timer.timeout.connect(self.__on_show_widget_finished)
+        self.__show_widgte_finished_timer.setSingleShot(True)
+        self.__show_widgte_finished_timer.start(1)
 
     def __on_show_widget_finished(self):
+        print("on widget finished")
  #       self.__view.reset_widgets()
  #       self.__view.change_ui_mod()
         self.__recognizer_scheduler.schedule()

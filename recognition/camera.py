@@ -80,6 +80,7 @@ class CameraCV(BaseCamera):
             ret, frame = self.__capture_device.read()
             if not ret:
                 print("not ret")
+                self.__capture_device = cv2.VideoCapture(0)  # dirty hack to reset camera when an error occurred
                 continue
             self._detect_faces(frame)
             if len(self._faces) == 0:
