@@ -119,11 +119,8 @@ class Controller(QRunnable):
  #       self.__view.change_ui_mod()
         self.__recognizer_scheduler.schedule()
 
-    def __new_pictures(self):
-        print("new pictures")
-        self.__recognizer_scheduler.learn()
-
     def __relearn(self):
+        print("relearn")
         self.__recognizer_scheduler.learn()
 
     def __learning_error_cb(self):
