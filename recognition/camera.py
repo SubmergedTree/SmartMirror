@@ -107,7 +107,7 @@ class Camera:
 
     def stop(self):
         print("Camera stop")
-        self.__camera.stop = True
+        #self.__camera.stop = True # stopping camera chrashes the whole appplication.
 
 
 #CAMERA_RESOLUTION = (480, 368)
