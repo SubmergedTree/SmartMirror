@@ -1,7 +1,7 @@
 # SmartMirror
 
 Work in Progress !
-(not functional)
+(not working yet)
 
 # Installation
 pip install -r requirements.txt
