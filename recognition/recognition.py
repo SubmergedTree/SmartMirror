@@ -115,6 +115,7 @@ class Recognizer(QRunnable):
             self.signals.recognizer_halt.emit()
 
     def stop_recognizer(self):
+        self.camera.stop()
         self.recognize = False
 
 
