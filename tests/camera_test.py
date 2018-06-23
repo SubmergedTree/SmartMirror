@@ -1,6 +1,6 @@
 import unittest
 import cv2
-from recognition.camera import CameraCV, WhichCamera
+from recognition.camera import CameraCV, WhichCamera, Camera
 from root_dir import ROOT_DIR
 
 cascade = ROOT_DIR + "/util/lbpcascade_frontalface.xml"
@@ -18,7 +18,7 @@ class CV2Mock:
     def release(self):
         pass
 
-# TODO this test is not automated: FIX: find detected face in source image
+
 class CameraTest(unittest.TestCase):
 
     def test_camera_cv(self):
@@ -26,3 +26,9 @@ class CameraTest(unittest.TestCase):
         face = camera.capture_face()
         cv2.imwrite('testimage.png', face)
         self.assertIsNotNone(face)
+
+    #def test_cv(self):
+    #    camera = Camera(cascade, WhichCamera.CV)
+    #    face = camera.capture_face()
+    #    cv2.imwrite("test.png", face)
+    #    self.assertIsNotNone(face)
