@@ -1,3 +1,5 @@
+from pathlib import Path
+
 
 def string_after_last_slash(to_cut):
     cut_list = to_cut.split('/')
@@ -11,3 +13,11 @@ def compare_filenames_in_path(first, second):
     name_first = string_after_last_slash(first)
     name_second = string_after_last_slash(second)
     return name_first == name_second
+
+
+def path_points_to_file(path):
+    pathlib_path = Path(path)
+    if pathlib_path.exists():
+        if pathlib_path.is_file():
+            return True
+    return False

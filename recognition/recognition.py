@@ -7,7 +7,7 @@ import cv2
 from database.database import *
 from database.dao import DBException
 import numpy as np
-
+from util.path import path_points_to_file
 
 def detect_face_from_image(image, cascade_classifier_path):
     #if not image:
@@ -78,10 +78,11 @@ class Learner(QRunnable):
                 return
             label_counter += 1
             for path in path_list:
-                face, rect = detect_face_from_image(cv2.imread(path.image_path), self.__cascade_classifier_path)
-                if face is not None:
-                    labels.append(label_counter)
-                    faces.append(face)
+                if path_points_to_file(path.image_path):
+                    face, rect = detect_face_from_image(cv2.imread(path.image_path), self.__cascade_classifier_path)
+                    if face is not None:
+                        labels.append(label_counter)
+                        faces.append(face)
         return faces, labels
 
 
