@@ -18,10 +18,11 @@ rest_impl_broker = None
 
 port = PORT_DEFAULT
 
+
 class RestApi(QThread):
     def __init__(self, rest_broker, server_port):
         super(RestApi, self).__init__()
-        global  guarded_executor, rest_impl_broker, port
+        global guarded_executor, rest_impl_broker, port
         guarded_executor = GuardedExecutor(lambda: super(RestApi, self).terminate())
         rest_impl_broker = rest_broker
         port = server_port
@@ -51,6 +52,7 @@ def new_user():
     result, status = rest_impl_broker.new_user(username, prename,
                                                name, image,
                                                save_image)
+    guarded_executor.unlock()
     return jsonify(result), status
 
 
@@ -75,8 +77,9 @@ def add_pictures():
     for x in range(0, number_of):
         images.append(request.files['images{}'.format(x)])
 
-    result, status = rest_impl_broker.add_picture(username, images, save_image)
-    return result, status
+    #result, status = rest_impl_broker.add_picture(username, images, save_image)
+    guarded_executor.unlock()
+    return "foo", 200
 
     # image = request.files['image']
     # image_name = username + str(datetime.now())

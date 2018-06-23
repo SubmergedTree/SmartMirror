@@ -111,7 +111,7 @@ class Controller(QRunnable):
         self.__show_widgte_finished_timer = QTimer()
         self.__show_widgte_finished_timer.timeout.connect(self.__on_show_widget_finished)
         self.__show_widgte_finished_timer.setSingleShot(True)
-        self.__show_widgte_finished_timer.start(1)
+        self.__show_widgte_finished_timer.start(WIDGET_SHOW_TIME)
 
     def __on_show_widget_finished(self):
         print("on widget finished")
