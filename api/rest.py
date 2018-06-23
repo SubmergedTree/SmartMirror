@@ -74,28 +74,13 @@ def add_pictures():
     except ValueError:
         return jsonify('Wrong arguments'), BADREQUEST
     images = []
-    for x in range(0, number_of):
-        images.append(request.files['images{}'.format(x)])
+    for x in range(1, number_of + 1):
+        images.append(request.files[str(x)])
 
-    #result, status = rest_impl_broker.add_picture(username, images, save_image)
+    result, status = rest_impl_broker.add_picture(username, images, save_image)
     guarded_executor.unlock()
-    return "foo", 200
+    return result, status
 
-    # image = request.files['image']
-    # image_name = username + str(datetime.now())
-    # image = request.files['image']
-    # image.save(secure_filename(image_name))
-    # with SafeSession() as safe_session:
-    #     assigned_user = safe_session.get_session().query(User).filter_by(username=username).first()
-    #     if assigned_user == None:
-    #         return jsonify('User: ' + username + ' does not exist'), HttpStatus.NOTFOUND
-    #     picture_to_store = Picture(username=assigned_user.username, image_path=image_name)
-    #     safe_session.add(picture_to_store)
-    #     safe_session.commit()
-    #     new_picture_signal.emit()
-    # guarded_executor.unlock()
-    # return jsonify(result), status
-   
 
 @app.route("/getWidgets", methods=["GET"])
 def get_widgets():

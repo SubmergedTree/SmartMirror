@@ -114,7 +114,9 @@ class AddPictures(RestImplBase):
                 for picture in pictures:
                     image_path = username + str(datetime.now())
                     path = save_func(picture, image_path)
-                    self._picture_dao.add_picture(username, path)
+                    if not self._picture_dao.add_picture(username, path):
+                        Logger.warn("Failed to add new paths to database. User: {}".format(username))
+                        return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
                 self.__new_pictures_signal.emit()
                 return "Pictures successfully added", HttpStatus.SUCCESS
             else:

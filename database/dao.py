@@ -78,8 +78,9 @@ class PictureDao:
     def add_picture(self, username, image_path):
         with SafeSession() as safe_session:
             try:
-                if safe_session.get_session().query(Picture).filter_by(username=username).first() is None:
-                    picture = Picture(username=username, image_path=image_path)
+                user = safe_session.get_session().query(User).filter_by(username=username).first()
+                if user:
+                    picture = Picture(username=user.username, image_path=image_path)
                     safe_session.add(picture)
                     safe_session.commit()
                     return True
