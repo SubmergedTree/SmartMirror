@@ -90,7 +90,17 @@ def get_widgets():
     return jsonify(result), status
 
 
-@app.route("/updateWidget", methods=["POST"])
+@app.route("/newWidget", methods=["POST"])
+def new_widget():
+    guarded_executor.lock()
+    widget = request.form['widget']
+    base_url = request.form['baseUrl']
+    result, status = rest_impl_broker.new_widget(widget, base_url)
+    guarded_executor.unlock()
+    return result, status
+
+
+@app.route("/updateWidget", methods=["POST"])  # TODO rename in updateWidgetMapping
 def update_widget():
     guarded_executor.lock()
     username = request.form['username']
