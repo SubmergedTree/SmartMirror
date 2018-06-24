@@ -85,11 +85,6 @@ class Controller(QRunnable):
         print("shut down")
         self.__recognizer_scheduler.shut_down()
         self.__rest_server.shut_down()
-        #try:
-        #    self.__rest_server.shut_down()
-        #except RuntimeError as e:
-        #    print("error")
-            # TODO: logging
         self.__is_running = False
         self.__thread_pool.waitForDone()
 
