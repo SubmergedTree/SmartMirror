@@ -100,9 +100,9 @@ class Controller(QRunnable):
     def __user_recognized_callback(self, username):
         print("user recognized {}".format(username))
         self.__view.change_ui_mode()
- #       widgets = self.__widget_resolver.process_widgets(username)
- #       for widget in widgets:
- #           self.__view.load_widget(widget.url, widget.position, widget.widget, widget.context)
+        widgets = self.__widget_resolver.process_widgets(username)
+        for widget in widgets:
+            self.__view.load_widget(widget.url, widget.position, widget.widget, widget.context)
         self.__show_widgte_finished_timer = QTimer()
         self.__show_widgte_finished_timer.timeout.connect(self.__on_show_widget_finished)
         self.__show_widgte_finished_timer.setSingleShot(True)

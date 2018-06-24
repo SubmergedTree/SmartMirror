@@ -97,8 +97,9 @@ class WidgetDao:
         url = None
         with SafeSession() as safe_session:
                 try:
-                    widget = safe_session.get_session().query(Picture).filter_by(widget=widget)
-                    url = widget.base_url
+                    widget = safe_session.get_session().query(Widget).filter_by(widget=widget).first()
+                    if widget:
+                        url = widget.base_url
                 except (SQLAlchemyError, DBAPIError) as e:
                     raise DBException(str(e))
         return url
@@ -147,8 +148,7 @@ class WidgetUserDao:
         mapping_list = []
         with SafeSession() as safe_session:
             try:
-                mapping = safe_session.get_session().query(WidgetUser).filter_by(username=username).all()
-                mapping_list.append(mapping)
+                mapping_list = safe_session.get_session().query(WidgetUser).filter_by(username=username).all()
             except (SQLAlchemyError, DBAPIError) as e:
                 raise DBException(str(e))
         return mapping_list
