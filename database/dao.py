@@ -141,6 +141,17 @@ class WidgetDao:
                 safe_session.rollback()
                 raise DBException(str)
 
+    def does_widget_exists(self, widget_name):
+        result = False
+        with SafeSession() as safe_session:
+                try:
+                    widget = safe_session.get_session().query(Widget).filter_by(widget=widget_name).first()
+                    if widget:
+                        result = True
+                except (SQLAlchemyError, DBAPIError) as e:
+                    raise DBException(str(e))
+        return result
+
 
 class WidgetUserDao:
 
@@ -155,16 +166,21 @@ class WidgetUserDao:
 
     def update(self, widget, username, position, context):  # TODO refactor lazy implementation
         self.delete(username, position)
+        success = False
         with SafeSession() as safe_session:
             try:
-                widget_user = WidgetUser(widget=widget, username=username, position=position, context=context)
-                safe_session.add(widget_user)
-                safe_session.commit()
-            except (SQLAlchemyError, DBAPIError) as e:
+                if WidgetDao().does_widget_exists(widget):
+                    widget_user = WidgetUser(widget=widget, username=username, position=position, context=context)
+                    safe_session.add(widget_user)
+                    safe_session.commit()
+                    success = False
+            except (SQLAlchemyError, DBAPIError, DBException) as e:
                 safe_session.rollback()
                 raise DBException(str)
+        return success
 
     def delete(self, username, position):
+        success = False
         with SafeSession() as safe_session:
             try:
                 mapping_to_delete = safe_session.get_session().query(WidgetUser)\
@@ -173,9 +189,8 @@ class WidgetUserDao:
                 if mapping_to_delete:
                     safe_session.delete(mapping_to_delete)
                     safe_session.commit()
-                    return True
-                else:
-                    return False
+                    success =  True
             except (SQLAlchemyError, DBAPIError) as e:
                 safe_session.rollback()
                 raise DBException(str)
+        return success
