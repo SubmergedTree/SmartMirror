@@ -135,7 +135,7 @@ class GetWidgets(RestImplBase):
             widgets = self._widget_dao.get_widgets()
             widget_list_serializable = []
             for widget in widgets:
-                widget_list_serializable.append({'widget': widget.username,
+                widget_list_serializable.append({'widget': widget.widget,
                                                  'base_url': widget.base_url})
             return widget_list_serializable, HttpStatus.SUCCESS
         except self._DBException:
@@ -148,6 +148,8 @@ class UpdateWidgetOfPerson(RestImplBase):
 
     def __call__(self, username, widget, position, context):
         Logger.info('request: updateWidgetsOfPerson; username: {}; widget: {}'.format(username, widget))
+        if not context or context == '':
+            context = 'None'
         try:
             self._widget_user_dao.update(widget, username, position, context)
             return 'Widget Updated', HttpStatus.SUCCESS
