@@ -104,7 +104,7 @@ class Controller(QRunnable):
 
     def __user_recognized_callback(self, username):
         print("user recognized {}".format(username))
-#         self.__view.change_ui_mod()
+        self.__view.change_ui_mode()
  #       widgets = self.__widget_resolver.process_widgets(username)
  #       for widget in widgets:
  #           self.__view.load_widget(widget.url, widget.position, widget.widget, widget.context)
@@ -115,8 +115,8 @@ class Controller(QRunnable):
 
     def __on_show_widget_finished(self):
         print("on widget finished")
- #       self.__view.reset_widgets()
- #       self.__view.change_ui_mod()
+        self.__view.reset_widgets()
+        self.__view.change_ui_mode()
         self.__recognizer_scheduler.schedule()
 
     def __relearn(self):
@@ -139,13 +139,13 @@ def set_up():
 
 if __name__ == '__main__':
     thread_pool = QThreadPool() # TODO use single thread with moveToThread instead of threadpool
-    app, view, api_key_dict, config, cascade = set_up()
-    controller = Controller(cascade_path=cascade, config=config, api_key_dict=api_key_dict, view=view,
+    app, mirror_view, api_key_dict, config, cascade = set_up()
+    controller = Controller(cascade_path=cascade, config=config, api_key_dict=api_key_dict, view=mirror_view,
                             thread_pool=thread_pool, RestServer=RestApi,
                             RecognizerScheduler=Scheduler, Camera=Camera, WidgetResolver=WidgetResolver,
                             UserDao=UserDao, PictureDao=PictureDao, WidgetDao=WidgetDao, WidgetUserDao=WidgetUserDao)
     thread_pool.start(controller)
     app.aboutToQuit.connect(lambda: controller.shut_down())
-    view.show_window()
+    mirror_view.show_window()
     sys.exit(app.exec_())
 

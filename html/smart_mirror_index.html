@@ -67,7 +67,7 @@ body {
 const notSet = "<span style=\"font-size: 5em;\" class=\"glyphicon glyphicon-exclamation-sign\"></span>";
 const loading = "<p id=\'joke\'><i class=\"fa fa-refresh fa-spin\" style=\"font-size:50px\"></i></p>";
 
-changeModeIdle();
+changeModeToIdle();
 
 String.prototype.format = function() {
   let a = this;
@@ -86,11 +86,11 @@ class Registration {
 
 let registrations = [];
 
-function register(widgetType, func) {
+function register(widgetType, func) { // call from widget js
     registrations.push(new Registration(widgetType, func));
 }
 
-function loadWidget(url, position, widgetType, context) {
+function loadWidget(url, position, widgetType, context) { // call from python
     const element = document.getElementById(position);
     element.innerHTML = loading;
     for (let i = 0; i < registrations.length; i++) {
@@ -100,7 +100,7 @@ function loadWidget(url, position, widgetType, context) {
     }
 }
 
-function restCall(url, callback, position, queryString) {
+function restCall(url, callback, position, queryString) { // call from widget js
   const xhr  = new XMLHttpRequest();
   if (queryString.localeCompare("")) {
       url = url + "?" + queryString;
@@ -110,13 +110,13 @@ function restCall(url, callback, position, queryString) {
   	if (xhr.readyState === 4 && xhr.status === 200) {
   	    callback(JSON.parse(xhr.responseText), position);
   	} else {
-  	    // show error
+  	    // TODO show error
     }
   };
   xhr.send(null);
 }
 
-function changeModeWidgets() {
+function changeModeToIdle() {
   const divHide = document.getElementById("hide");
   if (divHide.style.display === "none") {
       divHide.style.display = "block";
@@ -125,7 +125,7 @@ function changeModeWidgets() {
   }
 }
 
-function changeModeIdle() {
+function changeModeToWidgets() {
   const divHide = document.getElementById("idle");
   if (divHide.style.display === "none") {
       divHide.style.display = "block";
@@ -135,8 +135,8 @@ function changeModeIdle() {
 }
 
 function changeMode() {// call from python
-  changeModeWidgets();
-  changeModeIdle();
+  changeModeToIdle();
+  changeModeToWidgets();
 }
 
 function resetWidgets() { // call from python
@@ -150,7 +150,7 @@ function resetWidgets() { // call from python
     element.innerHTML = notSet;
 }
 
-function changeWidget(id, html) {
+function changeWidget(id, html) { // call from widget js
     let element = document.getElementById(id);
     element.innerHTML = html;
 }
