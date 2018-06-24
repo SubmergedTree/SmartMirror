@@ -151,8 +151,11 @@ class UpdateWidgetOfPerson(RestImplBase):
         if not context or context == '':
             context = 'None'
         try:
-            self._widget_user_dao.update(widget, username, position, context)
-            return 'Widget Updated', HttpStatus.SUCCESS
+            result = self._widget_user_dao.update(widget, username, position, context)
+            if result:
+                return 'Widget Updated', HttpStatus.SUCCESS
+            else:
+                return 'Widget Updated', HttpStatus.CONFLICT
         except self._DBException:
             return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
 
