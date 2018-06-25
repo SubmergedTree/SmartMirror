@@ -32,7 +32,7 @@ class RestBroker:
         self.new_widget = NewWidget(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
         self.status = Status(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
         self.new_user = NewUser(user_dao, picture_dao, widget_dao, widget_user_dao, DBException, self.add_picture, users_changed_signal)
-
+        self.delete_widget = DeleteWidget(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
 
 
 class RestImplBase:
@@ -173,7 +173,20 @@ class NewWidget(RestImplBase):
             return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
 
 
-# TODO delete widgets; reset
+class DeleteWidget(RestImplBase):
+    def __init__(self, user_dao, picture_dao, widget_dao, widget_user_dao, DBException):
+        super(DeleteWidget, self).__init__(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
+
+    def __call__(self, widget):
+        Logger.info('request: deleteWidget; widget: {}'.format(widget))
+        try:
+            res = self._widget_dao.delete_widget(widget)
+            return ('Widget successfully deleted', HttpStatus.SUCCESS) if res else ('Widget not found', HttpStatus.NOTFOUND)
+        except self._DBException:
+            return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
+
+
+# TODO reset
 
 
 class Status(RestImplBase):

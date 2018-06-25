@@ -100,6 +100,15 @@ def new_widget():
     return result, status
 
 
+@app.route("/deleteWidget", methods=["Delete"])
+def delete_widget():
+    guarded_executor.lock()
+    widget = request.form['widget']
+    result, status = rest_impl_broker.delete_widget(widget)
+    guarded_executor.unlock()
+    return result, status
+
+
 @app.route("/updateWidget", methods=["POST"])  # TODO rename in updateWidgetMapping
 def update_widget():
     guarded_executor.lock()
