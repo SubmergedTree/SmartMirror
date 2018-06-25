@@ -8,6 +8,7 @@ from view.view import View, WebEngineFacade
 from view.html_builder import HtmlBuilder
 from load_config import ConfigLoader
 from root_dir import ROOT_DIR
+from util.logger import Logger
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QThreadPool, QRunnable, QTimer
@@ -83,23 +84,23 @@ class Controller(QRunnable):
             pass
 
     def shut_down(self):
-        print("shut down")
+        Logger.info("Shut down")
         self.__recognizer_scheduler.shut_down()
         self.__rest_server.shut_down()
         self.__is_running = False
         self.__thread_pool.waitForDone()
 
     def __is_learning_cb(self):
-        print("is learning") # TODO view shows hint
+        Logger.info("Start learning") # TODO view shows hint
 
     def __finished_learning_cb(self):
-        print("finished learning") # TODO remove learning hint
+        Logger.info("Learning finished") # TODO remove learning hint
 
     def __no_training_data_cb(self):
-        print("no training data")
+        Logger.info("No training data")
 
     def __user_recognized_callback(self, username):
-        print("user recognized {}".format(username))
+        Logger.info("User recognized {}".format(username))
         self.__view.change_ui_mode()
         widgets = self.__widget_resolver.process_widgets(username)
         for widget in widgets:
@@ -110,13 +111,13 @@ class Controller(QRunnable):
         self.__show_widgte_finished_timer.start(WIDGET_SHOW_TIME)
 
     def __on_show_widget_finished(self):
-        print("on widget finished")
+        Logger.info("Show widgets finished")
         self.__view.reset_widgets()
         self.__view.change_ui_mode()
         self.__recognizer_scheduler.schedule()
 
     def __relearn(self):
-        print("relearn")
+        Logger.info("Relearn request")
         self.__recognizer_scheduler.learn()
 
     def __learning_error_cb(self):
