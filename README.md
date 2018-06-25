@@ -3,6 +3,7 @@
 v0.1 - Early Alpha
 
 # Road to v1.0
+- More Widgets out of the box
 - Support CSS
 - Support Images
 
