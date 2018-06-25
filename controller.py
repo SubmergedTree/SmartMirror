@@ -37,6 +37,7 @@ HTML_DIR = ROOT_DIR + '/html'
 HTML_INDEX = HTML_DIR + '/smart_mirror_index.html'
 IMAGE_BASE_PATH = ''
 
+
 class Controller(QRunnable):
     def __init__(self,cascade_path, config, api_key_dict, view, thread_pool, RestServer, RecognizerScheduler, Camera, WidgetResolver,
                 UserDao, PictureDao, WidgetDao, WidgetUserDao):
