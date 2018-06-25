@@ -30,7 +30,7 @@ DEFAULT_SERVER_PORT = 5000
 DEFAULT_MAPPING = {"standard": ConfigValues.Standard, "legacy": ConfigValues.Legacy,
                    "generic": ConfigValues.Generic, "pi": ConfigValues.Pi}
 
-WIDGET_SHOW_TIME = 300  # TODO make configurable
+WIDGET_SHOW_TIME = 30000  # TODO make configurable
 
 JS_DIR = ROOT_DIR + '/js'
 HTML_DIR = ROOT_DIR + '/html'

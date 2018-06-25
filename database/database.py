@@ -21,7 +21,7 @@ class User(Base):
     prename = Column(String(250))
     name = Column(String(250))
     pictures = relationship('Picture', cascade='all,delete', backref='User')
-    widget_person = relationship('WidgetUser', cascade='all,delete', backref='User')
+    widget_user = relationship('WidgetUser', cascade='all,delete', backref='User')
 
 
 class Picture(Base):
