@@ -35,7 +35,7 @@ WIDGET_SHOW_TIME = 30000  # TODO make configurable
 JS_DIR = ROOT_DIR + '/js'
 HTML_DIR = ROOT_DIR + '/html'
 HTML_INDEX = HTML_DIR + '/smart_mirror_index.html'
-IMAGE_BASE_PATH = ''
+IMAGE_BASE_PATH = 'images/'
 
 
 class Controller(QRunnable):

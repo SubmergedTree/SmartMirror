@@ -129,7 +129,8 @@ def status():
     return jsonify(result), status
 
 
-def save_image(img, name):
+def save_image(img, directory, name):
     path = secure_filename(name)
+    path = directory + '/' + path
     img.save(path)
     return path

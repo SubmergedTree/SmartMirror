@@ -22,7 +22,8 @@ INTERNAL_SERVER_ERROR_MSG = '500 - Internal Server Error'
 
 # TODO write daos in lower case
 class RestBroker:
-    def __init__(self, user_dao, picture_dao, widget_dao, widget_user_dao, DBException, new_pictures_signal, users_changed_signal, image_base_path):
+    def __init__(self, user_dao, picture_dao, widget_dao, widget_user_dao, DBException, new_pictures_signal,
+                 users_changed_signal, image_base_path):
         self.get_users = GetUsers(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
         self.delete_user = DeleteUser(user_dao, picture_dao, widget_dao, widget_user_dao, DBException, users_changed_signal)
         self.add_picture = AddPictures(user_dao, picture_dao, widget_dao, widget_user_dao, DBException,
@@ -113,7 +114,7 @@ class AddPictures(RestImplBase):
             if self._user_dao.get_user_by_username(username):
                 for picture in pictures:
                     image_path = username + str(datetime.now())
-                    path = save_func(picture, image_path)
+                    path = save_func(picture, self.__image_base_path, image_path)
                     if not self._picture_dao.add_picture(username, path):
                         Logger.warn("Failed to add new paths to database. User: {}".format(username))
                         return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
