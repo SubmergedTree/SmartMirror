@@ -28,10 +28,10 @@ CONFIG_PATH = '/config.json'
 DEFAULT_WEB_ENGINE = ConfigValues.Standard
 DEFAULT_CAMERA = ConfigValues.Generic
 DEFAULT_SERVER_PORT = 5000
+DEFAULT_WIDGET_SHOW_TIME = 2000
 DEFAULT_MAPPING = {"standard": ConfigValues.Standard, "legacy": ConfigValues.Legacy,
                    "generic": ConfigValues.Generic, "pi": ConfigValues.Pi}
 
-WIDGET_SHOW_TIME = 30000  # TODO make configurable
 
 JS_DIR = ROOT_DIR + '/js'
 HTML_DIR = ROOT_DIR + '/html'
@@ -108,7 +108,7 @@ class Controller(QRunnable):
         self.__show_widgte_finished_timer = QTimer()
         self.__show_widgte_finished_timer.timeout.connect(self.__on_show_widget_finished)
         self.__show_widgte_finished_timer.setSingleShot(True)
-        self.__show_widgte_finished_timer.start(WIDGET_SHOW_TIME)
+        self.__show_widgte_finished_timer.start(config.widget_show_time)
 
     def __on_show_widget_finished(self):
         Logger.info("Show widgets finished")
@@ -126,7 +126,8 @@ class Controller(QRunnable):
 
 def set_up():
     cascade = ROOT_DIR + FRONTAL_FACE_PATH
-    config_loader = ConfigLoader(DEFAULT_WEB_ENGINE, DEFAULT_CAMERA, DEFAULT_SERVER_PORT, DEFAULT_MAPPING)
+    config_loader = ConfigLoader(DEFAULT_WEB_ENGINE, DEFAULT_CAMERA, DEFAULT_SERVER_PORT,
+                                 DEFAULT_WIDGET_SHOW_TIME,DEFAULT_MAPPING)
     api_key_dict, config = config_loader.load(CONFIG_PATH)
     mirror_app = QApplication(sys.argv)
     html_builder = HtmlBuilder(JS_DIR, HTML_DIR, HTML_INDEX)

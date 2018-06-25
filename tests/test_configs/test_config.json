@@ -2,6 +2,7 @@
   "webEngine": "legacy",
   "camera": "pi",
   "serverPort": 5000,
+  "widgetShowTime": 3000,
   "apiKeys": [
     {
       "widget": "WeatherNow",
