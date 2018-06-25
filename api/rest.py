@@ -42,7 +42,7 @@ def get_users():
     return jsonify(result), status
 
 
-@app.route("/newUser", methods=["POST"])  # TODO 1 picture needed
+@app.route("/newUser", methods=["POST"])
 def new_user():
     guarded_executor.lock()
     username = request.form['username']
