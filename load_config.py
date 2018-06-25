@@ -1,4 +1,5 @@
 from root_dir import ROOT_DIR
+from util.logger import Logger
 import json
 
 
@@ -54,11 +55,10 @@ class ConfigLoader:
             api_key_dict = self.__api_keys_list_to_dict(api_keys_list)
             return api_key_dict, Config(web_engine, camera, port, widget_show_time)
         except (IOError, KeyError, ValueError) as e:
+            Logger.warn("Malformed or missing config. {}".format(e))
             return {}, self.__get_default_config()
-        # TODO: log error
         finally:
             try:
                 fh.close()
             except Exception as e:
-                pass
-            # TODO: log error
+                Logger.warn("Unable to close fh in Logger {}".format(e))
