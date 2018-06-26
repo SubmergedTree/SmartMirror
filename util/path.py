@@ -17,7 +17,9 @@ def compare_filenames_in_path(first, second):
 
 def path_points_to_file(path):
     pathlib_path = Path(path)
-    if pathlib_path.exists():
-        if pathlib_path.is_file():
-            return True
-    return False
+    return pathlib_path.exists() and pathlib_path.is_file()
+
+
+def path_points_to_directory(path):
+    pathlib_path = Path(path)
+    return pathlib_path.exists() and pathlib_path.is_dir()
