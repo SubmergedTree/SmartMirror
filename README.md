@@ -14,7 +14,6 @@ v0.1 - Early Alpha
 # Installation
 pip install -r requirements.txt
 
-Make sure an *images* directory is provided. (will be changed soon )
 ####Optional
 For Raspberry Pi specific Camera:
 pip install picamera
