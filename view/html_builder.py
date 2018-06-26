@@ -1,5 +1,5 @@
 import os
-from util.path import compare_filenames_in_path, string_after_last_slash
+from util.path import compare_filenames_in_path, string_after_last_slash, get_files_in_dir
 from util.string import to_string_with_escape_sequences
 
 JS_FILENAME_END = 'Eval.js'
@@ -29,15 +29,23 @@ class HtmlBuilder:
             return fh.read()
 
     def __scan_html_js_files(self):
-        html_files = []
-        js_files = []
-        for file in os.listdir(self.__js_dir):
-            if file.endswith(JS_FILENAME_END):
-                js_files.append(os.path.join(self.__js_dir, file))
-        for file in os.listdir(self.__html_dir):
-            if file.endswith(HTML_FILENAME_END):
-                html_files.append(os.path.join(self.__html_dir, file))
+        html_files = get_files_in_dir(self.__html_dir, HTML_FILENAME_END)
+        js_files = get_files_in_dir(self.__js_dir, JS_FILENAME_END)
+        html_files = self.__prepend_dir_path(html_files, self.__html_dir)
+        js_files = self.__prepend_dir_path(js_files, self.__js_dir)
+        #for file in os.listdir(self.__js_dir):
+        #    if file.endswith(JS_FILENAME_END):
+        #        js_files.append(os.path.join(self.__js_dir, file))
+        #for file in os.listdir(self.__html_dir):
+        #    if file.endswith(HTML_FILENAME_END):
+        #        html_files.append(os.path.join(self.__html_dir, file))
         return html_files, js_files
+
+    def __prepend_dir_path(self, file_list, to_prepend):
+        new_list = []
+        for file in file_list:
+            new_list.append(os.path.join(to_prepend, file))
+        return new_list
 
     def __sort_js_html_files(self, html_files, js_files):
         result = {}

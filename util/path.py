@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 
+
 def string_after_last_slash(to_cut):
     cut_list = to_cut.split('/')
     if len(cut_list) == 0:
