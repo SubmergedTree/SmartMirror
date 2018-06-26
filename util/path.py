@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import os
 
 def string_after_last_slash(to_cut):
     cut_list = to_cut.split('/')
@@ -28,3 +28,15 @@ def path_points_to_directory(path):
 def create_directory(path):
     pathlib_path = Path(path)
     pathlib_path.mkdir(parents=True, exist_ok=True)
+
+
+def get_files_in_dir(path, end_with=None):
+    files = []
+    if end_with:
+        for file in os.listdir(path):
+            if file.endswith(end_with):
+                files.append(file)
+    else:
+        for file in os.listdir(path):
+            files.append(file)
+    return files
