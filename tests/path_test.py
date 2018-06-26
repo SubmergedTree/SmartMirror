@@ -1,7 +1,9 @@
 import unittest
 from root_dir import ROOT_DIR
+from pathlib import Path
 
 from util.path import compare_filenames_in_path, path_points_to_directory, path_points_to_file, string_after_last_slash
+from util.path import create_directory
 
 PATH_TO_FOLDER = ROOT_DIR + '/tests/test_data'
 PATH_TO_FILE = ROOT_DIR + '/tests/test_data/string_test_should'
@@ -11,6 +13,8 @@ FILENAME_2 = 'qwe/rtt/SAME'
 FILENAME_3 = 'poi/uzt/rew'
 
 FILENAME_WITHOUT_SLASH = "qwertz"
+
+DIRECTORY_TO_CREATE_PATH = ROOT_DIR + "/tests/testDirectory"
 
 
 class PathTest(unittest.TestCase):
@@ -46,3 +50,10 @@ class PathTest(unittest.TestCase):
     def test_cut_without_slash(self):
         res = string_after_last_slash(FILENAME_WITHOUT_SLASH)
         self.assertEqual(FILENAME_WITHOUT_SLASH, res)
+
+    def test_create_directory(self):
+        create_directory(DIRECTORY_TO_CREATE_PATH)
+        res = path_points_to_directory(DIRECTORY_TO_CREATE_PATH)
+        helper_path = Path(DIRECTORY_TO_CREATE_PATH)
+        helper_path.rmdir()
+        self.assertTrue(res)

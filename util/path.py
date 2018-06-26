@@ -23,3 +23,8 @@ def path_points_to_file(path):
 def path_points_to_directory(path):
     pathlib_path = Path(path)
     return pathlib_path.exists() and pathlib_path.is_dir()
+
+
+def create_directory(path):
+    pathlib_path = Path(path)
+    pathlib_path.mkdir(parents=True, exist_ok=True)
