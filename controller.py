@@ -9,7 +9,7 @@ from view.html_builder import HtmlBuilder
 from load_config import ConfigLoader
 from root_dir import ROOT_DIR
 from util.logger import Logger
-
+from .util.path import path_points_to_directory, create_directory
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QThreadPool, QRunnable, QTimer
 import sys
@@ -37,6 +37,7 @@ JS_DIR = ROOT_DIR + '/js'
 HTML_DIR = ROOT_DIR + '/html'
 HTML_INDEX = HTML_DIR + '/smart_mirror_index.html'
 IMAGE_BASE_PATH = 'images/'
+IMAGES_FOLDER_PATH = ROOT_DIR + '/images' # QUESTION: This or above for RestBroker ?
 
 
 class Controller(QRunnable):
@@ -58,6 +59,8 @@ class Controller(QRunnable):
         self.rest_impl_signals = RestImplSignal()
         self.rest_impl_signals.new_pictures.connect(self.__relearn)
         self.rest_impl_signals.users_changed.connect(self.__relearn)
+
+        # TODO autofill / check widget Table instead of a REST call
 
         self.__rest_server = RestServer(RestBroker(user_dao=self.__user_dao, picture_dao=self.__picture_dao,
                                                    widget_dao=self.__widget_dao,
@@ -125,6 +128,7 @@ class Controller(QRunnable):
 
 
 def set_up():
+    check_if_images_dir_exists()
     cascade = ROOT_DIR + FRONTAL_FACE_PATH
     config_loader = ConfigLoader(DEFAULT_WEB_ENGINE, DEFAULT_CAMERA, DEFAULT_SERVER_PORT,
                                  DEFAULT_WIDGET_SHOW_TIME,DEFAULT_MAPPING)
@@ -133,6 +137,11 @@ def set_up():
     html_builder = HtmlBuilder(JS_DIR, HTML_DIR, HTML_INDEX)
     mirror_view = View(False, config.web_engine, html_builder.build_html())  # TODO FULLSCREEN
     return mirror_app, mirror_view, api_key_dict, config, cascade
+
+
+def check_if_images_dir_exists():
+    if not path_points_to_directory(IMAGES_FOLDER_PATH):
+        create_directory(IMAGES_FOLDER_PATH)
 
 
 if __name__ == '__main__':
