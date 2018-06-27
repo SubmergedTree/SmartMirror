@@ -6,7 +6,7 @@ from recognition.recognition import Scheduler
 from widget.widget_resolver import WidgetResolver
 from view.view import View, WebEngineFacade
 from view.html_builder import HtmlBuilder
-from load_config import ConfigLoader
+from loader.load_config import ConfigLoader
 from root_dir import ROOT_DIR
 from util.logger import Logger
 from .util.path import path_points_to_directory, create_directory

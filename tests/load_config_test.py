@@ -1,5 +1,5 @@
 import unittest
-from load_config import ConfigLoader, APIKey, Config
+from loader.load_config import ConfigLoader, APIKey
 
 
 class Values:
