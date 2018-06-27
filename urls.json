@@ -1,0 +1,6 @@
+[
+  {
+    "widget": "chuckNoris",
+    "url": "http://api.icndb.com/jokes/random"
+  }
+]
