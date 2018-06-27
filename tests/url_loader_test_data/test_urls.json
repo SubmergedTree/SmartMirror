@@ -1,0 +1,10 @@
+[
+  {
+    "widget": "foo",
+    "url": "fooUrl"
+  },
+  {
+    "widget": "bar",
+    "url": "barUrl"
+  }
+]
