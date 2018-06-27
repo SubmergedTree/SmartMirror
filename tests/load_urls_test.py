@@ -5,6 +5,7 @@ from loader.load_urls import UrlLoader
 TEST_URLS_PATH = ROOT_DIR + '/tests/url_loader_test_data/test_urls.json'
 TEST_WRONG_KEY_URLS_PATH = ROOT_DIR + '/tests/url_loader_test_data/wrong_key.json'
 TEST_MALFORMED_URLS_PATH = ROOT_DIR + '/tests/url_loader_test_data/malformed.json'
+TEST_DOES_NOT_EXIST_URLS_PATH = ROOT_DIR + '/tests/url_loader_test_data/not_exist.json'
 
 
 class ShouldList:
@@ -40,10 +41,16 @@ class LoadUrlsTest(unittest.TestCase, UrlListAssert):
         self.assertUrlListContainsSame(urls, ['foo', 'bar'], ['fooUrl', 'barUrl'])
 
     def test_no_urls_file_exists(self):
-        pass
+        url_loader = UrlLoader()
+        urls = url_loader.load_urls(TEST_DOES_NOT_EXIST_URLS_PATH)
+        # TODO
 
     def test_malformed_urls_file(self):
-        pass
+        url_loader = UrlLoader()
+        urls = url_loader.load_urls(TEST_MALFORMED_URLS_PATH)
+        # TODO
 
     def test_wrong_key_urls_file(self):
-        pass
+        url_loader = UrlLoader()
+        urls = url_loader.load_urls(TEST_WRONG_KEY_URLS_PATH)
+        # TODO
