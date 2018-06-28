@@ -1,6 +1,6 @@
 from root_dir import ROOT_DIR
 import unittest
-from loader.load_urls import UrlLoader
+from loader.load_urls import UrlLoader, UrlMapping, NoUrlMappingException
 
 TEST_URLS_PATH = ROOT_DIR + '/tests/url_loader_test_data/test_urls.json'
 TEST_WRONG_KEY_URLS_PATH = ROOT_DIR + '/tests/url_loader_test_data/wrong_key.json'
@@ -8,29 +8,16 @@ TEST_MALFORMED_URLS_PATH = ROOT_DIR + '/tests/url_loader_test_data/malformed.jso
 TEST_DOES_NOT_EXIST_URLS_PATH = ROOT_DIR + '/tests/url_loader_test_data/not_exist.json'
 
 
-class ShouldList:
-    def __init__(self, widgets, urls):
-        self.widgets = widgets
-        self.urls = urls
-
-    def __contains__(self, item):
-        widget_pos = None
-        urls_pos = None
-        if item.widget in self.widgets:
-            widget_pos = self.widgets.index(item.widget)
-        if item.url in self.urls:
-            urls_pos = self.urls.index(item.url)
-        if not (widget_pos and urls_pos and widget_pos == urls_pos):
-            raise AssertionError('widget: {} / url: {} shall not exist'.format(item.widget, item.url))
-
-
 class UrlListAssert:
 
-    def assertUrlListContainsSame(self, url_list, should_widgets, should_urls):
-        s = ShouldList(should_widgets, should_urls)
-        for item in url_list:
-            if item.widget not in s:
-                raise AssertionError('{} not in second list'.format(item))
+    def assertUrlListContainsSame(self, is_url_list, should_url_list):
+        len_is = len(is_url_list)
+        len_should = len(should_url_list)
+        if len_is != len_should:
+            raise AssertionError('Size is different')
+        for index in range(0, len_is):
+            if not is_url_list[index].__eq__(should_url_list[index]):
+                raise AssertionError('Values are different')
 
 
 class LoadUrlsTest(unittest.TestCase, UrlListAssert):
@@ -38,19 +25,27 @@ class LoadUrlsTest(unittest.TestCase, UrlListAssert):
     def test_load_urls(self):
         url_loader = UrlLoader()
         urls = url_loader.load_urls(TEST_URLS_PATH)
-        self.assertUrlListContainsSame(urls, ['foo', 'bar'], ['fooUrl', 'barUrl'])
+        self.assertUrlListContainsSame(urls, [UrlMapping('foo', 'fooUrl'), UrlMapping('bar', 'barUrl')])
 
     def test_no_urls_file_exists(self):
         url_loader = UrlLoader()
-        urls = url_loader.load_urls(TEST_DOES_NOT_EXIST_URLS_PATH)
-        # TODO
+        try:
+            url_loader.load_urls(TEST_DOES_NOT_EXIST_URLS_PATH)
+        except NoUrlMappingException:
+            self.assertTrue(True)
+        #self.assertRaises(NoUrlMappingException, url_loader.load_urls(TEST_DOES_NOT_EXIST_URLS_PATH))
 
     def test_malformed_urls_file(self):
         url_loader = UrlLoader()
-        urls = url_loader.load_urls(TEST_MALFORMED_URLS_PATH)
-        # TODO
+        try:
+            url_loader.load_urls(TEST_MALFORMED_URLS_PATH)
+        except NoUrlMappingException:
+            self.assertTrue(True)
+
 
     def test_wrong_key_urls_file(self):
         url_loader = UrlLoader()
-        urls = url_loader.load_urls(TEST_WRONG_KEY_URLS_PATH)
-        # TODO
+        try:
+            url_loader.load_urls(TEST_WRONG_KEY_URLS_PATH)
+        except NoUrlMappingException:
+            self.assertTrue(True)
