@@ -7,9 +7,11 @@ from widget.widget_resolver import WidgetResolver
 from view.view import View, WebEngineFacade
 from view.html_builder import HtmlBuilder
 from loader.load_config import ConfigLoader
+from loader.load_urls import UrlLoader, NoUrlMappingException
+from loader.load_widgets import WidgetLoader
 from root_dir import ROOT_DIR
 from util.logger import Logger
-from .util.path import path_points_to_directory, create_directory
+from util.path import path_points_to_directory, create_directory
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QThreadPool, QRunnable, QTimer
 import sys
@@ -24,6 +26,7 @@ class ConfigValues:
 
 FRONTAL_FACE_PATH = '/util/lbpcascade_frontalface.xml'
 CONFIG_PATH = '/config.json'
+URLS_PATH = '/urls.json'
 
 DEFAULT_WEB_ENGINE = ConfigValues.Standard
 DEFAULT_CAMERA = ConfigValues.Generic
@@ -56,6 +59,8 @@ class Controller(QRunnable):
         self.__widget_dao = WidgetDao()
         self.__widget_user_dao = WidgetUserDao()
 
+        self.__update_widgets()
+
         self.rest_impl_signals = RestImplSignal()
         self.rest_impl_signals.new_pictures.connect(self.__relearn)
         self.rest_impl_signals.users_changed.connect(self.__relearn)
@@ -81,6 +86,10 @@ class Controller(QRunnable):
         self.__show_widgte_finished_timer = None
 
         self.__rest_server.start()
+
+    def __update_widgets(self):
+        url_mapping = UrlLoader().load_urls(ROOT_DIR + URLS_PATH)
+        WidgetLoader(self.__widget_dao, url_mapping).update_widget_table()
 
     def run(self): # For non blocking ui
         while self.__is_running:
@@ -145,14 +154,17 @@ def check_if_images_dir_exists():
 
 
 if __name__ == '__main__':
-    thread_pool = QThreadPool() # TODO use single thread with moveToThread instead of threadpool
+    thread_pool = QThreadPool()  # TODO use single thread with moveToThread instead of threadpool
     app, mirror_view, api_key_dict, config, cascade = set_up()
-    controller = Controller(cascade_path=cascade, config=config, api_key_dict=api_key_dict, view=mirror_view,
-                            thread_pool=thread_pool, RestServer=RestApi,
-                            RecognizerScheduler=Scheduler, Camera=Camera, WidgetResolver=WidgetResolver,
-                            UserDao=UserDao, PictureDao=PictureDao, WidgetDao=WidgetDao, WidgetUserDao=WidgetUserDao)
-    thread_pool.start(controller)
-    app.aboutToQuit.connect(lambda: controller.shut_down())
-    mirror_view.show_window()
-    sys.exit(app.exec_())
-
+    try:
+        controller = Controller(cascade_path=cascade, config=config, api_key_dict=api_key_dict, view=mirror_view,
+                                thread_pool=thread_pool, RestServer=RestApi,
+                                RecognizerScheduler=Scheduler, Camera=Camera, WidgetResolver=WidgetResolver,
+                                UserDao=UserDao, PictureDao=PictureDao, WidgetDao=WidgetDao,
+                                WidgetUserDao=WidgetUserDao)
+        thread_pool.start(controller)
+        app.aboutToQuit.connect(lambda: controller.shut_down())
+        mirror_view.show_window()
+        sys.exit(app.exec_())
+    except NoUrlMappingException as e:
+        Logger.error('No url mapping found: {}'.format(e))
