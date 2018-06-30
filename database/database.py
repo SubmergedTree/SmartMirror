@@ -90,7 +90,10 @@ class SafeSession:
     
     def delete(self, to_delete):
         self.__session.delete(to_delete)
-        
+
+    def rollback(self):
+        self.__session.rollback()
+
     def get_session(self):
         return self.__session
 

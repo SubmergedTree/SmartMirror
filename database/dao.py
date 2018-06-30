@@ -3,7 +3,8 @@ from sqlalchemy.exc import SQLAlchemyError, DBAPIError, IntegrityError
 
 
 class DBException(Exception):
-    pass
+    def __init__(self, message):
+        super().__init__(message)
 
 
 class UserDao:
@@ -108,24 +109,28 @@ class WidgetDao:
         widgets = []
         with SafeSession() as safe_session:
             try:
-                widgets = safe_session.get_session().query(Widget.widget).all()
+                tuple_widgets = safe_session.get_session().query(Widget.widget).all()
+                for item in tuple_widgets:
+                    widgets.append(item[0])
             except (SQLAlchemyError, DBAPIError) as e:
                 raise DBException(str(e))
         return widgets
 
     def add_widget(self, widget, base_url):
+        ret = None
         with SafeSession() as safe_session:
             try:
                 if safe_session.get_session().query(Widget).filter_by(widget=widget).first() is None:
                     widget = Widget(widget=widget, base_url=base_url)
                     safe_session.add(widget)
                     safe_session.commit()
-                    return True
+                    ret = True
                 else:
-                    return False
+                    ret = False
             except (SQLAlchemyError, DBAPIError) as e:
                 safe_session.rollback()
                 raise DBException(str)
+        return ret
 
     def delete_widget(self, widget):
         with SafeSession() as safe_session:
