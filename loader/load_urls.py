@@ -28,4 +28,3 @@ class UrlLoader:
             Logger.warn("Unable to parse urls.json: {}".format(e))
             raise NoUrlMappingException()
         return urls
-
