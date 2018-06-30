@@ -1,11 +1,11 @@
 import json
-from root_dir import ROOT_DIR
 from util.logger import Logger
 
 
 class NoUrlMappingException(Exception):
     def __init__(self):
         pass
+
 
 class UrlMapping:
     def __init__(self, widget, url):
@@ -14,6 +14,7 @@ class UrlMapping:
 
     def __eq__(self, other):
         return self.widget == other.widget and self.url == other.url
+
 
 class UrlLoader:
 
