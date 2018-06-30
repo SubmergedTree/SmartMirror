@@ -3,6 +3,7 @@ from api.rest_impl import RestBroker, RestImplSignal
 from database.dao import UserDao, PictureDao, WidgetDao, WidgetUserDao, DBException
 from recognition.camera import Camera, WhichCamera
 from recognition.recognition import Scheduler
+from recognition.learning_error_exception import LearningErrorException
 from widget.widget_resolver import WidgetResolver
 from view.view import View, WebEngineFacade
 from view.html_builder import HtmlBuilder
@@ -64,8 +65,6 @@ class Controller(QRunnable):
         self.rest_impl_signals = RestImplSignal()
         self.rest_impl_signals.new_pictures.connect(self.__relearn)
         self.rest_impl_signals.users_changed.connect(self.__relearn)
-
-        # TODO autofill / check widget Table instead of a REST call
 
         self.__rest_server = RestServer(RestBroker(user_dao=self.__user_dao, picture_dao=self.__picture_dao,
                                                    widget_dao=self.__widget_dao,
@@ -133,7 +132,7 @@ class Controller(QRunnable):
         self.__recognizer_scheduler.learn()
 
     def __learning_error_cb(self):
-        pass
+        raise LearningErrorException()
 
 
 def set_up():
@@ -168,3 +167,7 @@ if __name__ == '__main__':
         sys.exit(app.exec_())
     except NoUrlMappingException as e:
         Logger.error('No url mapping found: {}'.format(e))
+    except LearningErrorException:
+        Logger.error('An error occurred during learning')
+    except DBException as e:
+        Logger.error('An error occurred in database: {}'.format(e))
