@@ -108,7 +108,7 @@ class WidgetDao:
         widgets = []
         with SafeSession() as safe_session:
             try:
-                widgets = safe_session.get_session().query(Widget).all()
+                widgets = safe_session.get_session().query(Widget.widget).all()
             except (SQLAlchemyError, DBAPIError) as e:
                 raise DBException(str(e))
         return widgets

@@ -134,11 +134,11 @@ class GetWidgets(RestImplBase):
         Logger.info('request: getWidgets')
         try:
             widgets = self._widget_dao.get_widgets()
-            widget_list_serializable = []
-            for widget in widgets:
-                widget_list_serializable.append({'widget': widget.widget,
-                                                 'base_url': widget.base_url})
-            return widget_list_serializable, HttpStatus.SUCCESS
+            # widget_list_serializable = []
+            # for widget in widgets:
+            #     widget_list_serializable.append({'widget': widget.widget,
+            #                                      'base_url': widget.base_url})
+            return widgets, HttpStatus.SUCCESS
         except self._DBException:
             return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
 
