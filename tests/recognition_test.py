@@ -229,7 +229,7 @@ def test_learn_recognize_recognize():
                    finished_learning_cb, no_training_data_cb, user_recognized_cb, learning_error_cb)
 
 
-def test_learn_learn_recognize():  # TODO
+def test_learn_learn_recognize():
     global s4
     to_recognize = 'Jmi'
 

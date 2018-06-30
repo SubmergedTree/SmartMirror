@@ -73,7 +73,8 @@ class View:
         try:
             self.__web_engine = WebEngineFacade(which_web_engine, self.__layout)
         except CouldNotImportException as e:
-            raise e  # TODO logging
+            Logger.error('Could not import chosen web engine')
+            raise e
 
     def __setup_window(self):
         window = QWidget()

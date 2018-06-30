@@ -20,7 +20,6 @@ class HttpStatus:
 
 INTERNAL_SERVER_ERROR_MSG = '500 - Internal Server Error'
 
-# TODO write daos in lower case
 class RestBroker:
     def __init__(self, user_dao, picture_dao, widget_dao, widget_user_dao, DBException, new_pictures_signal,
                  users_changed_signal, image_base_path):
@@ -108,7 +107,7 @@ class AddPictures(RestImplBase):
         self.__new_pictures_signal = new_pictures_signal
         self.__image_base_path = image_base_path
 
-    def __call__(self, username, pictures, save_func): # TODO PATH
+    def __call__(self, username, pictures, save_func):
         Logger.info('request: addPictures; username: {}'.format(username))
         try:
             if self._user_dao.get_user_by_username(username):

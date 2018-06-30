@@ -9,12 +9,15 @@ from database.dao import DBException
 import numpy as np
 from util.path import path_points_to_file
 
+CASCADE_SCALE_FACTOR = 1.2
+CASCADE_MIN_NEIGHBORS = 5
+
 def detect_face_from_image(image, cascade_classifier_path):
     #if not image:
     #    return None, None
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     face_cascade = cv2.CascadeClassifier(cascade_classifier_path)
-    faces = face_cascade.detectMultiScale(gray_image, scaleFactor=1.2, minNeighbors=5)  # TODO remove magic numbers
+    faces = face_cascade.detectMultiScale(gray_image, scaleFactor=CASCADE_SCALE_FACTOR, minNeighbors=CASCADE_MIN_NEIGHBORS)
     if len(faces) == 0:
         return None, None
     (x, y, w, h) = faces[0]

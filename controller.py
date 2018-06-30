@@ -5,7 +5,7 @@ from recognition.camera import Camera, WhichCamera
 from recognition.recognition import Scheduler
 from recognition.learning_error_exception import LearningErrorException
 from widget.widget_resolver import WidgetResolver
-from view.view import View, WebEngineFacade
+from view.view import View, WebEngineFacade, CouldNotImportException
 from view.html_builder import HtmlBuilder
 from loader.load_config import ConfigLoader
 from loader.load_urls import UrlLoader, NoUrlMappingException
@@ -171,3 +171,5 @@ if __name__ == '__main__':
         Logger.error('An error occurred during learning')
     except DBException as e:
         Logger.error('An error occurred in database: {}'.format(e))
+    except CouldNotImportException as e:
+        pass  # logging happens in view
