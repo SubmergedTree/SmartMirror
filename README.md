@@ -1,9 +1,11 @@
 # SmartMirror
 
-v0.1 - Early Alpha
+v0.2 - Early Alpha
 
 # Road to v1.0
 - More Widgets out of the box
+
+# Road to v2.0
 - Support CSS
 - Support Images
 
@@ -96,10 +98,17 @@ function chuckNorisCallback(json, position) {
 }
 ```
 
-Now fire the new widget rest call against your SmartMirror.
-It is a post request with a body which should contain:
-- widget:<unique_name>
-- baseUrl:<url for rest call>
+Now edit the urls.json file like below:
+```json
+[
+  {
+    "widget": "chuckNoris",
+    "url": "http://api.icndb.com/jokes/random"
+  }
+]
+```
+For new widgets append new entries to the array.
+
 
 **Only one rest call is permitted for a widget.**
 
