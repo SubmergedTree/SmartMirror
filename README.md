@@ -11,7 +11,7 @@ v0.2 - Early Alpha
 
 # Supplementary Projects
 - Android App TBD
-- Web App TBD (not yet started)
+- Web App TBD
 
 # Installation
 pip install -r requirements.txt
@@ -28,10 +28,11 @@ Create "config.json" in root directory.
 Example:
 ```json
 {
-  "webEngine": "standart", // (or "legacy")
+  "webEngine": "standard", // (or "legacy")
   "camera": "generic",  // (or "pi")
   "serverPort": 5000,
   "widgetShowTime": 3000,
+  "fullscreen": true,
   "apiKeys": [
     {
       "widget": "WeatherNow",
