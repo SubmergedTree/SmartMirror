@@ -63,9 +63,6 @@ class WebEngineFacade:
         return self.__engine
 
 
-#class ViewSignals:
-#    pass
-
 class View:
     def __init__(self, fullscreen, which_web_engine, index_html):
         self.__index_html = index_html
