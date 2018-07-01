@@ -147,7 +147,7 @@ def set_up():
     api_key_dict, config = config_loader.load(CONFIG_PATH)
     mirror_app = QApplication(sys.argv)
     html_builder = HtmlBuilder(JS_DIR, HTML_DIR, HTML_INDEX)
-    mirror_view = View(False, config.web_engine, html_builder.build_html())  # TODO FULLSCREEN
+    mirror_view = View(config.fullscreen, config.web_engine, html_builder.build_html())  # TODO FULLSCREEN
     return mirror_app, mirror_view, api_key_dict, config, cascade
 
 

@@ -66,16 +66,18 @@ class WebEngineFacade:
 class View:
     def __init__(self, fullscreen, which_web_engine, index_html):
         self.__index_html = index_html
-        self.__win, self.__layout = self.__setup_window()
+        self.__win, self.__layout = self.__setup_window(fullscreen)
         try:
             self.__web_engine = WebEngineFacade(which_web_engine, self.__layout)
         except CouldNotImportException as e:
             Logger.error('Could not import chosen web engine')
             raise e
 
-    def __setup_window(self):
+    def __setup_window(self, fullscreen):
         window = QWidget()
         window.setWindowTitle('SmartMirror')
+        if fullscreen:
+            window.showFullScreen()
         layout = QVBoxLayout()
         window.setLayout(layout)
         return window, layout
@@ -100,7 +102,6 @@ class View:
 
     def change_mode_to_learning(self):
         self.__web_engine.engine.eval_js('changeModeToLearning();')
-
 
     def reset_widgets(self):
         self.__web_engine.engine.eval_js('resetWidgets();')

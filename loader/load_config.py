@@ -10,11 +10,12 @@ class APIKey:
 
 
 class Config:
-    def __init__(self, web_engine, camera, server_port, widget_show_time):
+    def __init__(self, web_engine, camera, server_port, widget_show_time, fullscreen):
         self.web_engine = web_engine
         self.camera = camera
         self.server_port = server_port
         self.widget_show_time = widget_show_time
+        self.fullscreen = fullscreen
 
 
 class ConfigLoader:
@@ -27,7 +28,7 @@ class ConfigLoader:
 
     def __get_default_config(self):
         return Config(self.__default_web_engine, self.__default_camera,
-                      self.__default_server_port, self.__default_widget_show_time)
+                      self.__default_server_port, self.__default_widget_show_time, False)
 
     def __evaluate_simple(self, web_engine_str, camera_str):
         return self.__mapping[web_engine_str], self.__mapping[camera_str]
@@ -50,10 +51,11 @@ class ConfigLoader:
             camera_str = config_dict["camera"]
             port = config_dict["serverPort"]
             widget_show_time = config_dict["widgetShowTime"]
+            fullscreen = config_dict["fullscreen"]
             api_keys_list = config_dict["apiKeys"]
             web_engine, camera = self.__evaluate_simple(web_engine_str=web_engine_str, camera_str=camera_str)
             api_key_dict = self.__api_keys_list_to_dict(api_keys_list)
-            return api_key_dict, Config(web_engine, camera, port, widget_show_time)
+            return api_key_dict, Config(web_engine, camera, port, widget_show_time, fullscreen)
         except (IOError, KeyError, ValueError) as e:
             Logger.warn("Malformed or missing config. {}".format(e))
             return {}, self.__get_default_config()

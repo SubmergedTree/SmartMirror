@@ -28,12 +28,14 @@ class LoadConfigTest(unittest.TestCase):
         should_camera = Values.Pi
         should_port = 5000
         should_show_time = 3000
+        should_fullscreen = True
         api_key_dict, config = self.config_loader.load("/tests/test_configs/test_config.json")
 
         self.assertEqual(config.server_port, should_port)
         self.assertEqual(config.camera, should_camera)
         self.assertEqual(config.web_engine, should_web_engine)
         self.assertEqual(config.widget_show_time, should_show_time)
+        self.assertEqual(config.fullscreen, should_fullscreen)
         self.assertTrue(self.__compare_api_key_dict(api_key_dict, should_api_key_dict))
 
     '''it should return default config'''
