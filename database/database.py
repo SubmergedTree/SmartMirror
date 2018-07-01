@@ -39,7 +39,7 @@ class Widget(Base):
 
 class WidgetUser(Base):
     __tablename__ = 'WidgetUser'
-    mapping_id = Column(Integer, primary_key=True)
+    identifier = Column(String(251), primary_key=True)
     username = Column(String(250), ForeignKey('User.username'))
     widget = Column(String(250), ForeignKey('Widget.widget'))
     position = Column(Integer)

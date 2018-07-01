@@ -1,5 +1,6 @@
 from database.database import SafeSession, User, Widget, WidgetUser, Picture
 from sqlalchemy.exc import SQLAlchemyError, DBAPIError, IntegrityError
+from sqlalchemy import func
 
 
 class DBException(Exception):
@@ -170,12 +171,14 @@ class WidgetUserDao:
         return mapping_list
 
     def update(self, widget, username, position, context):  # TODO refactor lazy implementation
-        self.delete(username, position)
+        identifier = username + str(position)
+        self.delete(identifier)
         success = False
         with SafeSession() as safe_session:
             try:
                 if WidgetDao().does_widget_exists(widget):
-                    widget_user = WidgetUser(widget=widget, username=username, position=position, context=context)
+                    widget_user = WidgetUser(identifier=identifier,widget=widget,
+                                             username=username, position=position, context=context)
                     safe_session.add(widget_user)
                     safe_session.commit()
                     success = False
@@ -184,13 +187,11 @@ class WidgetUserDao:
                 raise DBException(str)
         return success
 
-    def delete(self, username, position):
+    def delete(self, identifier):
         success = False
         with SafeSession() as safe_session:
             try:
-                mapping_to_delete = safe_session.get_session().query(WidgetUser)\
-                    .filter(WidgetUser.username == username and WidgetUser.position == position)\
-                    .first()
+                mapping_to_delete = safe_session.get_session().query(WidgetUser).filter_by(identifier=identifier).first()
                 if mapping_to_delete:
                     safe_session.delete(mapping_to_delete)
                     safe_session.commit()
@@ -199,3 +200,4 @@ class WidgetUserDao:
                 safe_session.rollback()
                 raise DBException(str)
         return success
+
