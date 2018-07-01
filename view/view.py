@@ -92,8 +92,18 @@ class View:
         self.__win.show()
         self.__load_index_html()
 
-    def change_ui_mode(self):
-        self.__web_engine.engine.eval_js('changeMode();')
+    #def change_ui_mode(self):
+    #    self.__web_engine.engine.eval_js('changeMode();')
+
+    def change_mode_to_show_widgets(self):
+        self.__web_engine.engine.eval_js('changeModeToWidgets();')
+
+    def change_mode_to_idle(self):
+        self.__web_engine.engine.eval_js('changeModeToIdle();')
+
+    def change_mode_to_learning(self):
+        self.__web_engine.engine.eval_js('changeModeToLearning();')
+
 
     def reset_widgets(self):
         self.__web_engine.engine.eval_js('resetWidgets();')

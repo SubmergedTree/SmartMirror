@@ -102,17 +102,20 @@ class Controller(QRunnable):
         self.__thread_pool.waitForDone()
 
     def __is_learning_cb(self):
-        Logger.info("Start learning") # TODO view shows hint
+        self.__view.change_mode_to_learning()
+        Logger.info("Start learning")
 
     def __finished_learning_cb(self):
-        Logger.info("Learning finished") # TODO remove learning hint
+        self.__view.change_mode_to_idle()
+        Logger.info("Learning finished")
 
     def __no_training_data_cb(self):
         Logger.info("No training data")
 
     def __user_recognized_callback(self, username):
         Logger.info("User recognized {}".format(username))
-        self.__view.change_ui_mode()
+        #self.__view.change_ui_mode()
+        self.__view.change_mode_to_show_widgets()
         widgets = self.__widget_resolver.process_widgets(username)
         for widget in widgets:
             self.__view.load_widget(widget.url, widget.position, widget.widget, widget.context)
@@ -124,7 +127,8 @@ class Controller(QRunnable):
     def __on_show_widget_finished(self):
         Logger.info("Show widgets finished")
         self.__view.reset_widgets()
-        self.__view.change_ui_mode()
+        #self.__view.change_ui_mode()
+        self.__view.change_mode_to_idle()
         self.__recognizer_scheduler.schedule()
 
     def __relearn(self):

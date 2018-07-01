@@ -28,7 +28,7 @@ body {
 
 <body>
 
-<div id="hide">
+<div id="show">
   <h1>Smart Mirror</h1>
 
   <div class="row">
@@ -61,6 +61,10 @@ body {
 <div id="idle">
   <div id="idleClock" class="centerClock">
   </div>
+</div>
+
+<div id="learning">
+    Learning...
 </div>
 
 <script>
@@ -117,27 +121,39 @@ function restCall(url, callback, position, queryString) { // call from widget js
 }
 
 function changeModeToIdle() {
-  const divHide = document.getElementById("hide");
+  /*const divHide = document.getElementById("show");
   if (divHide.style.display === "none") {
       divHide.style.display = "block";
   } else {
       divHide.style.display = "none";
-  }
+  }*/
+    document.getElementById("learning").style.display = "none";
+    document.getElementById("idle").style.display = "block";
+    document.getElementById("show").style.display = "none";
 }
 
 function changeModeToWidgets() {
-  const divHide = document.getElementById("idle");
+  /*const divHide = document.getElementById("show");
   if (divHide.style.display === "none") {
       divHide.style.display = "block";
   } else {
       divHide.style.display = "none";
-  }
+  } */
+    document.getElementById("learning").style.display = "none";
+    document.getElementById("idle").style.display = "none";
+    document.getElementById("show").style.display = "block";
 }
 
-function changeMode() {// call from python
+function changeModeToLearning() {
+    document.getElementById("learning").style.display = "block";
+    document.getElementById("idle").style.display = "none";
+    document.getElementById("show").style.display = "none";
+}
+
+/*function changeMode() {// call from python
   changeModeToIdle();
   changeModeToWidgets();
-}
+}*/
 
 function resetWidgets() { // call from python
     let element = document.getElementById('1');
