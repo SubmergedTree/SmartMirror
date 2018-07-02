@@ -28,11 +28,12 @@ class RestBroker:
         self.add_picture = AddPictures(user_dao, picture_dao, widget_dao, widget_user_dao, DBException,
                                        new_pictures_signal, image_base_path)
         self.get_widgets = GetWidgets(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
-        self.update_widget_of_person = UpdateWidgetOfPerson(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
+        self.update_widget_of_user = UpdateWidgetOfPerson(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
         self.new_widget = NewWidget(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
         self.status = Status(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
         self.new_user = NewUser(user_dao, picture_dao, widget_dao, widget_user_dao, DBException, self.add_picture, users_changed_signal)
         self.delete_widget = DeleteWidget(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
+        self.delete_widget_of_user = DeleteWidgetOfUser(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
 
 
 class RestImplBase:
@@ -156,6 +157,22 @@ class UpdateWidgetOfPerson(RestImplBase):
                 return 'Widget Updated', HttpStatus.SUCCESS
             else:
                 return 'Widget Updated', HttpStatus.CONFLICT
+        except self._DBException:
+            return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
+
+
+class DeleteWidgetOfUser(RestImplBase):
+    def __init__(self, user_dao, picture_dao, widget_dao, widget_user_dao, DBException):
+        super(DeleteWidgetOfUser, self).__init__(user_dao, picture_dao, widget_dao, widget_user_dao, DBException)
+
+    def __call__(self, username, position):
+        Logger.info('request: deleteWidgetOfUser; username: {}; position: {}'.format(username, position))
+        try:
+            result = self._widget_user_dao.delete(username + str(position))
+            if result:
+                return 'Widget deleted', HttpStatus.SUCCESS
+            else:
+                return 'Can not delete widget', HttpStatus.CONFLICT
         except self._DBException:
             return INTERNAL_SERVER_ERROR_MSG, HttpStatus.INTERNALSERVERERROR
 

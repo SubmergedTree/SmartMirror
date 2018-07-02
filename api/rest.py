@@ -109,14 +109,21 @@ def delete_widget():
     return result, status
 
 
-@app.route("/updateWidget", methods=["POST"])  # TODO rename in updateWidgetMapping
+@app.route("/updateWidget", methods=["POST", "DELETE"])  # TODO rename in updateWidgetMapping
 def update_widget():
+    result = None
+    status = None
     guarded_executor.lock()
-    username = request.form['username']
-    widget = request.form['widget']
-    position = request.form['position']
-    context = request.form['context']
-    result, status = rest_impl_broker.update_widget_of_person(username, widget, position, context)
+    if request.method == 'GET':
+        username = request.form['username']
+        widget = request.form['widget']
+        position = request.form['position']
+        context = request.form['context']
+        result, status = rest_impl_broker.update_widget_of_user(username, widget, position, context)
+    elif request.method == 'DELETE':
+        username = request.form['username']
+        position = request.form['position']
+        result, status = rest_impl_broker.delete_widget_of_user(username, position)
     guarded_executor.unlock()
     return jsonify(result), status
 
