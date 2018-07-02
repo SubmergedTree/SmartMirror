@@ -19,5 +19,5 @@ class WidgetResolver:
         url = self.__widget_dao.get_base_url(widget)
         if widget in self.__api_keys:
             api_key = self.__api_keys[widget]
-            url = url + '&' + api_key.name + '=' + api_key.key
+            url = url + '?' + api_key.name + '=' + api_key.key
         return url

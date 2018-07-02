@@ -47,5 +47,5 @@ class WidgetResolverTest(unittest.TestCase):
 
     def test_with_api_key(self):
         resolved = self.resolver.process_widgets('Fib')
-        self.assertEqual("www.example.com/rest&APPID=1234567890", resolved[0].url)
+        self.assertEqual("www.example.com/rest?APPID=1234567890", resolved[0].url)
 
