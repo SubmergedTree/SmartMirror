@@ -2,5 +2,17 @@
   {
     "widget": "chuckNoris",
     "url": "http://api.icndb.com/jokes/random"
+  },
+  {
+    "widget": "catFacts",
+    "url": "https://catfact.ninja/fact"
+  },
+  {
+    "widget": "weatherToday",
+    "url": "http://api.openweathermap.org/data/2.5/weather"
+  },
+    {
+    "widget": "weatherForecast",
+    "url": "http://api.openweathermap.org/data/2.5/forecast"
   }
 ]

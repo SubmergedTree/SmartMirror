@@ -106,8 +106,8 @@ function loadWidget(url, position, widgetType, context) { // call from python
 
 function restCall(url, callback, position, queryString) { // call from widget js
   const xhr  = new XMLHttpRequest();
-  if (queryString.localeCompare("")) {
-      url = url + "?" + queryString;
+  if (queryString.localeCompare("None")) {
+      url = url + queryString;
   }
   xhr.open('GET', url, true);
   xhr.onload = function () {
