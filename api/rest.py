@@ -114,7 +114,7 @@ def update_widget():
     result = None
     status = None
     guarded_executor.lock()
-    if request.method == 'GET':
+    if request.method == 'POST':
         username = request.form['username']
         widget = request.form['widget']
         position = request.form['position']
