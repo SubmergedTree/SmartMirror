@@ -14,5 +14,9 @@
     {
     "widget": "weatherForecast",
     "url": "http://api.openweathermap.org/data/2.5/forecast"
+  },
+  {
+    "widget": "nextNationalHolidayGermany",
+    "url": "https://feiertage-api.de/api/"
   }
 ]

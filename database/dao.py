@@ -181,7 +181,7 @@ class WidgetUserDao:
                                              username=username, position=position, context=context)
                     safe_session.add(widget_user)
                     safe_session.commit()
-                    success = False
+                    success = True
             except (SQLAlchemyError, DBAPIError, DBException) as e:
                 safe_session.rollback()
                 raise DBException(str)
