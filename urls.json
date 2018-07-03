@@ -18,5 +18,9 @@
   {
     "widget": "nextNationalHolidayGermany",
     "url": "https://feiertage-api.de/api/"
+  },
+  {
+    "widget": "note",
+    "url": ""
   }
 ]
